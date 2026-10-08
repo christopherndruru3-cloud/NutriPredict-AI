@@ -4,7 +4,10 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from sklearn.ensemble import RandomForestClassifier
-import requests
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import base64
 
 # ---------------------------------------------------------
 # 1. KONFIGURASI HALAMAN
@@ -33,11 +36,15 @@ if 'height_val' not in st.session_state:
     st.session_state.height_val = 75.0
 if 'weight_val' not in st.session_state:
     st.session_state.weight_val = 11.0
+if 'birth_weight_val' not in st.session_state:
+    st.session_state.birth_weight_val = 3.0
+if 'asi_val' not in st.session_state:
+    st.session_state.asi_val = "Ya"
 if 'chat_messages' not in st.session_state:
     st.session_state.chat_messages = []
 
 # ---------------------------------------------------------
-# 3. DICTIONARY MULTI-LANGUAGE MERATA (ID / EN)
+# 3. DICTIONARY MULTI-LANGUAGE (ID / EN)
 # ---------------------------------------------------------
 LANG = {
     'ID': {
@@ -72,17 +79,18 @@ LANG = {
         'xai_title': "💡 Transparansi AI (Explainable AI - Feature Importance)",
         'sim_title': "🔮 Simulasi Target Pertumbuhan (What-If Analysis)",
         'sim_months': "Simulasi Ke Depan",
-        'print_btn': "🖨️ Cetak / Simpan Laporan ke PDF",
+        'print_btn': "🖨️ Cetak / Unduh Dokumen Laporan PDF",
+        'email_btn': "📧 Kirimkan Laporan Rekam Medis ke Email",
         'chart_title': "📈 Kurva Standar Pertumbuhan WHO / IMT",
         'chart_analysis_title': "📋 Ringkasan Analisis Tren Pertumbuhan",
         'recipe_title': "🥣 Panduan Menu Nutrisi 7 Hari & Tutorial Memasak Lengkap",
         'edu_title': "📚 Pusat Edukasi, Artikel & Video Resmi Kesehatan",
-        'chat_title': "🤖 NutriBot-AI: Konsultasi Interaktif Tumbuh Kembang & Kesehatan",
+        'chat_title': "🤖 NutriBot-AI: Konsultasi Interaktif Cerdas Lintas Usia",
         'report_card_title': "📋 KARTU LAPORAN ANTROPOMETRI & EVALUASI REKAM MEDIS DARING",
         'report_sub1': "1. Data Profil Balita & Orang Tua / Pengguna",
         'report_sub2': "2. Evaluasi Medis (WHO HAZ / IMT & AI)",
-        'report_sub3': "3. Rencana Tindakan Lanjutan (Action Plan)",
-        'report_note': "Catatan: Laporan ini terverifikasi otomatis dan dapat dicetak/disimpan langsung sebagai PDF untuk rujukan ke Posyandu/Puskesmas/Faskes.",
+        'report_sub3': "3. Rencana Tindakan Lanjutan Spesifik (Action Plan)",
+        'report_note': "Catatan: Laporan ini terverifikasi otomatis dan dapat diunduh/dicetak langsung sebagai PDF resmi untuk rujukan ke Posyandu/Puskesmas/Faskes.",
         'xai_features': ['Usia', 'Jenis Kelamin', 'Tinggi Badan', 'Berat Badan', 'Berat Lahir', 'ASI Eksklusif'],
         'xai_expl': "Penjelasan AI Transparency: Model kami menggunakan Random Forest Classifier yang dilatih pada indikator antropometri standar WHO dan Indeks Massa Tubuh (IMT)."
     },
@@ -118,16 +126,17 @@ LANG = {
         'xai_title': "💡 AI Transparency (Explainable AI - Feature Importance)",
         'sim_title': "🔮 Growth Target Simulation (What-If Analysis)",
         'sim_months': "Months / Years Ahead",
-        'print_btn': "🖨️ Print / Save Report Card to PDF",
+        'print_btn': "🖨️ Print / Download PDF Medical Report",
+        'email_btn': "📧 Send Medical Report to Email",
         'chart_title': "📈 WHO Standard Growth & BMI Curve",
         'chart_analysis_title': "📋 Growth Trend Analysis Summary",
         'recipe_title': "🥣 7-Day Nutritional Recipe Guide & Full Cooking Tutorials",
         'edu_title': "📚 Educational Hub, Articles & Official Health Videos",
-        'chat_title': "🤖 NutriBot-AI: Interactive Health & Growth Consultation",
+        'chat_title': "🤖 NutriBot-AI: Smart Interactive Consultation",
         'report_card_title': "📋 ONLINE MEDICAL & ANTHROPOMETRY REPORT CARD",
         'report_sub1': "1. User & Profile Data",
         'report_sub2': "2. Medical Evaluation (WHO HAZ / BMI & AI)",
-        'report_sub3': "3. Follow-up Action Plan",
+        'report_sub3': "3. Specific Follow-up Action Plan",
         'report_note': "Note: This report is automatically logged and can be saved as PDF to bring to local health clinics.",
         'xai_features': ['Age', 'Gender', 'Height', 'Weight', 'Birth Weight', 'Exclusive Breastfeeding'],
         'xai_expl': "AI Transparency Explanation: Our model utilizes a Random Forest Classifier trained on WHO anthropometric data and Body Mass Index (BMI)."
@@ -151,7 +160,7 @@ if st.session_state.logged_in:
         st.rerun()
 
 # ---------------------------------------------------------
-# 4. STYLING CSS ANIMATIF & PRINT FIX
+# 4. STYLING CSS ANIMATIF
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -244,22 +253,6 @@ st.markdown("""
         width: 100%;
         text-transform: uppercase;
     }
-    
-    @media print {
-        body * { visibility: hidden !important; }
-        #printable-report, #printable-report * { visibility: visible !important; }
-        #printable-report {
-            position: fixed !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 100% !important;
-            background: white !important;
-            color: black !important;
-            border: 2px solid #000 !important;
-            box-shadow: none !important;
-            z-index: 999999 !important;
-        }
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -309,18 +302,130 @@ def calculate_who_zscore(age, height):
         
     return round(z_score, 2), status, color, round(base_median, 1)
 
-def generate_bot_response(user_text, child_name, age_cat, age, height, weight):
-    t = user_text.lower()
-    if "teh" in t or "kopi" in t:
-        return f"Bunda/Ayah, **memberikan teh atau kopi pada balita ({child_name}) sangat berbahaya secara medis**. Teh mengandung tanin yang mengikat zat besi dari makanan hingga 70%, yang dapat memicu Anemia Defisiensi Besi kronis dan stunting!"
-    elif "susah makan" in t or "gtm" in t or "ikan" in t:
-        return f"Untuk ananda **{child_name}** yang susah makan / menolak ikan:\n1. Ganti dengan **telur puyuh, hati ayam, udang, atau daging sapi**.\n2. Buat kreasi seperti bakso ayam udang atau perkedel daging.\n3. Batasi waktu makan maksimal 30 menit & jangan berikan teh/kopi sebelum jam makan."
-    elif "tinggi" in t or "pendek" in t or "stunting" in t:
-        return f"Tinggi badan sangat dipengaruhi kecukupan **Protein Hewani** (pemicu hormon pertumbuhan IGF-1) dan tidur malam nyenyak sebelum jam 9 malam (saat dirilisnya Growth Hormone)."
-    elif "kolesterol" in t or "darah tinggi" in t or "lansia" in t or "dewasa" in t:
-        return f"Untuk kelompok usia {age_cat}, sangat dianjurkan mengurangi konsumsi Gula, Garam, dan Lemak Jenuh (GGL). Perbanyak asam lemak Omega-3 dari ikan, serat sayuran, serta aktivitas fisik 30 menit setiap hari."
-    else:
-        return f"Halo! Saya NutriBot-AI 🤖 pakar gizi & tumbuh kembang medis. Ada yang ingin dikonsultasikan mengenai gizi, resep makanan, atau pola sehat Ananda/Pengguna **{child_name}**?"
+# DYNAMIC ACTION PLAN GENERATOR MEDIS BERVARIAI
+def generate_dynamic_action_plan(age_cat, age, height, weight, z_score, who_status, birth_weight, asi):
+    actions = []
+    
+    if age_cat == "Balita":
+        if z_score < -3:
+            actions.append("🚨 **Rujukan Medis Prioritas 1:** Segera bawa balita ke Dokter Spesialis Anak (Sp.A) di Rumah Sakit/Puskesmas untuk skrining stunting berat & pemeriksaan Red Flags infeksi kronis.")
+            actions.append("🍖 **Intervensi Dosis Protein Hewani Padat:** Berikan minimal 3 porsi Protein Hewani ganda per hari (Contoh: 1 Butir Telur Puyuh + 50g Hati Ayam Sangrai + 40g Ikan Kembung/Lele).")
+            actions.append("💊 **Suplementasi Medis:** Mintalah resep Sirup Zat Besi (Iron Supplement), Sirup Zinc, dan Vitamin A dosis tinggi dari Faskes setempat.")
+        elif -3 <= z_score < -2:
+            actions.append("⚠️ **Intervensi Gizi Puskesmas:** Jadwalkan konsultasi gizi bulanan di Posyandu/Puskesmas dan minta Pemberian Makanan Tambahan (PMT) kaya protein hewani.")
+            actions.append("🍳 **Peningkatan Kualitas MPASI:** Tambahkan booster lemak sehat (1 sdt minyak kelapa/santan/butter) pada setiap sajian MPASI untuk mengejar ketertinggalan energi.")
+            actions.append("🚫 **Pola Pengasuhan Ketat:** STOP pemberian teh, kopi, jus manis, atau jajanan kemasan yang mengikat zat besi & merusak nafsu makan balita.")
+        else:
+            actions.append("✅ **Pertahankan Nutrisi Ideal:** Lanjutkan pemberian variasi 2-3 porsi Protein Hewani (telur, ayam, ikan, daging) secara teratur setiap hari.")
+            actions.append("📏 **Pemantauan Rutin:** Catat grafik tumbuh kembang secara berkala setiap bulan di Posyandu atau aplikasi ini.")
+            
+        if birth_weight < 2.5:
+            actions.append("👶 **Atensi Berat Lahir Rendah (BBLR):** Karena riwayat BBLR ({birth_weight} kg), balita membutuhkan pengawasan ekstra pada grafik pemantauan pertumbuhan.")
+        if asi == "Tidak":
+            actions.append("🥛 **Kecukupan Pengganti ASI:** Pastikan asupan susu formula/pendamping ASI terisi dengan higienitas tinggi dan air minum matang steril.")
+            
+    elif age_cat in ["Anak-Anak", "Remaja"]:
+        bmi = weight / ((height/100)**2)
+        if bmi < 18.5:
+            actions.append("🥛 **Peningkatan Asupan Kalori Sehat:** Tambahkan porsi karbohidrat kompleks (nasi/kentang) dan snack bergizi tinggi (telur rebus, keju, kacang-kacangan).")
+            actions.append("💪 **Latihan Fisik & Tulang:** Anjurkan olahraga aktif minimal 45 menit/hari (renang, basket, melompat) untuk memicu hormon pertumbuhan tulang.")
+        elif bmi > 25:
+            actions.append("🥦 **Pola Makan Gizi Seimbang:** Kurangi minuman manis berbobat (boba, soda) dan gorengan. Ganti snack dengan buah segar & air putih.")
+            actions.append("🏃 **Aktivitas Fisik Teratur:** Tingkatkan jalan kaki atau olahraga aerobik 150 menit per minggu.")
+        else:
+            actions.append("🌟 **Kondisi Optimal:** Pertahankan pola makan gizi seimbang dan konsumsi 8 gelas air putih per hari.")
+            
+    else: # Dewasa & Lansia
+        bmi = weight / ((height/100)**2)
+        if bmi > 25:
+            actions.append("🫀 **Pencegahan Risiko Degeneratif:** Batasi asupan Gula, Garam, dan Lemak (GGL). Lakukan cek tekanan darah, gula darah, dan kolesterol berkala.")
+        actions.append("🥑 **Nutrisi Pelindung Otot & Tulang:** Cukupi kebutuhan kalsium, Vitamin D, dan protein mudah dicerna untuk mencegah penurunan massa otot (sarkopenia).")
+        actions.append("💧 **Hidrasi & Tidur Cukup:** Pastikan minum air putih yang cukup dan tidur berkualitas 7-8 jam per malam.")
+        
+    return actions
+
+# AI CHATBOT CERDAS BERVARIAI
+def generate_smart_ai_response(prompt, user_name, age_cat, age, height, weight):
+    p = prompt.lower()
+    
+    responses = {
+        "gtm": f"Halo Kak/Bunda dari **{user_name}**! Untuk mengatasi GTM (Gerak Tutup Mulut) atau anak susah makan:\n\n1. **Terapkan Feeding Rules:** Batasi waktu makan maksimal 30 menit. Jangan beri minuman manis atau camilan 2 jam sebelum jam makan utama.\n2. **Ganti Variasi Lauk:** Jika menolak nasi atau ikan, coba kreasikan **telur puyuh, hati ayam, atau perkedel daging sapi**.\n3. **Ciptakan Suasana Menyenangkan:** Hindari memaksa atau memarahi anak saat makan.",
+        
+        "teh": f"Pemberian teh atau kopi pada balita/anak sangat **TIDAK DIANJURKAN secara medis**! Teh mengandung senyawa *tanin* dan *fitat* yang mengikat zat besi (Fe) dan kalsium dari makanan hingga 70%. Akibatnya, nutrisi tidak terserap dan memicu Anemia Defisiensi Besi serta stunting.",
+        
+        "tinggi": f"Tinggi badan pengguna (**{user_name}**, {height} cm) sangat dipengaruhi oleh:\n1. **Kecukupan Protein Hewani:** Memicu sintesis hormon *IGF-1* dan sinyal *mTORC1* pada pembentukan tulang panjang.\n2. **Deep Sleep (Tidur Nyenyak):** Hormon pertumbuhan (*Growth Hormone*) diproduksi maksimal antara jam 22.00 - 02.00 malam saat anak tidur nyenyak.\n3. **Aktivitas Fisik:** Melompat, renang, atau berolahraga secara teratur.",
+        
+        "resep": f"Untuk kelompok usia **{age_cat}**, menu nutrisi terbaik mencakup kombinasi Protein Hewani Asam Amino Lengkap (Telur, Ikan, Daging, Ayam) dipadukan dengan lemak sehat (minyak kelapa/butter/santan) dan serat halus. Anda bisa melihat daftar resep lengkap 7 hari di **Tab 🥣 Resep Nutrisi 7 Hari**!",
+        
+        "stunting": f"Stunting adalah kondisi gagal tumbuh akibat kekurangan gizi kronis dan infeksi berulang pada 1.000 Hari Pertama Kehidupan (0-24 Bulan). Stunting dapat dicegah dengan intervensi **Protein Hewani harian**, imunisasi lengkap, kebersihan air/sanitasi (WASH), dan pemantauan rutin Z-Score WHO.",
+        
+        "berat": f"Untuk mengoptimalkan berat badan pada kelompok usia **{age_cat}** ({weight} kg):\n1. Tambahkan **booster kalori sehat** seperti butter, santan segar, keju, atau minyak kelapa pada sajian makanan.\n2. Pastikan asupan protein hewani mencukupi setiap kali makan.\n3. Skrining adanya infeksi tersembunyi (seperti ISPA, cacingan, atau ISK) jika berat badan tidak naik 2 bulan berturut-turut."
+    }
+    
+    for key in responses:
+        if key in p:
+            return responses[key]
+            
+    return f"Terima kasih atas pertanyaannya mengenai **{user_name}** ({age_cat})! Berdasarkan standar kesehatan medis: Pastikan kecukupan gizi seimbang kaya Protein Hewani, penuhi kebutuhan hidrasi air putih, hindari jajanan tinggi gula/garam, serta pantau secara teratur grafik kesehatan di dashboard ini. Ada hal spesifik lain tentang menu, tinggi badan, atau keluhan yang ingin Anda diskusikan?"
+
+# GENERATOR FILE PDF DOKUMEN FISIK LENGKAP
+def create_pdf_download_link(user_name, user_email, age_cat, age, gender, height, weight, birth_weight, asi, z_score, who_status, actions):
+    action_html = "".join([f"<li>{act}</li>" for act in actions])
+    
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <title>Laporan Rekam Medis - {user_name}</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; margin: 30px; color: #0F172A; line-height: 1.6; }}
+            .header {{ text-align: center; border-bottom: 3px solid #0284C7; padding-bottom: 10px; margin-bottom: 20px; }}
+            .header h1 {{ color: #0284C7; margin: 0; }}
+            .section {{ background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 8px; margin-bottom: 15px; }}
+            .section h3 {{ color: #0284C7; margin-top: 0; }}
+            table {{ width: 100%; border-collapse: collapse; }}
+            td {{ padding: 6px; font-size: 14px; }}
+            .status-badge {{ background: {'#EF4444' if z_score < -2 else '#10B981'}; color: white; padding: 4px 10px; border-radius: 4px; font-weight: bold; }}
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>📋 NUTRIPREDICT-AI PRO - DOKUMEN REKAM MEDIS</h1>
+            <p>Terverifikasi Otomatis Sistem Evaluasi Gizi & Kesehatan Multigenerasi</p>
+        </div>
+        
+        <div class="section">
+            <h3>1. Profil Pengguna & Orang Tua</h3>
+            <table>
+                <tr><td><strong>Nama Pengguna:</strong> {user_name}</td><td><strong>Email Kontak:</strong> {user_email}</td></tr>
+                <tr><td><strong>Kelompok Usia:</strong> {age_cat} ({age} {'Bulan' if age_cat=='Balita' else 'Tahun'})</td><td><strong>Jenis Kelamin:</strong> {gender}</td></tr>
+                <tr><td><strong>Tinggi Badan:</strong> {height} cm</td><td><strong>Berat Badan:</strong> {weight} kg</td></tr>
+                <tr><td><strong>Berat Lahir:</strong> {birth_weight} kg</td><td><strong>Riwayat ASI Eksklusif:</strong> {asi}</td></tr>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h3>2. Hasil Evaluasi Medis (WHO HAZ & AI)</h3>
+            <p><strong>Z-Score Standar Pertumbuhan:</strong> <span class="status-badge">{z_score} SD ({who_status})</span></p>
+            <p><strong>Status Diagnosa AI:</strong> Terverifikasi Sistem Diagnosa Antropometri Terpadu.</p>
+        </div>
+        
+        <div class="section">
+            <h3>3. Rencana Tindakan Lanjutan Medis (Action Plan)</h3>
+            <ul>{action_html}</ul>
+        </div>
+        
+        <br><br>
+        <p style="font-size: 11px; color: #64748B; text-align: center;">Dokumen ini dibuat otomatis oleh NutriPredict-AI Pro dan sah digunakan sebagai rujukan awal ke fasilitas kesehatan.</p>
+        
+        <script>window.onload = function() {{ window.print(); }};</script>
+    </body>
+    </html>
+    """
+    b64 = base64.b64encode(html_content.encode()).decode()
+    href = f'<a href="data:text/html;base64,{b64}" download="Laporan_Rekam_Medis_{user_name}.html" target="_blank" style="display:inline-block; background-color:#0284C7; color:white; padding:12px 25px; border-radius:50px; font-weight:bold; text-decoration:none; text-align:center; width:100%;">📄 UNDUH FILE DOKUMEN LAPORAN (PDF/HTML)</a>'
+    return href
 
 # ---------------------------------------------------------
 # 6. GATEWAY LOGIN
@@ -386,12 +491,14 @@ with tab1:
 
     with col2:
         weight = st.number_input(txt['weight_label'], min_value=2.0, max_value=180.0, value=st.session_state.weight_val, step=0.1)
-        birth_weight = st.number_input(txt['birth_weight_label'], min_value=1.0, max_value=5.0, value=3.0, step=0.1)
+        birth_weight = st.number_input(txt['birth_weight_label'], min_value=1.0, max_value=5.0, value=st.session_state.birth_weight_val, step=0.1)
         asi_str = st.selectbox(txt['asi_label'], options=[txt['yes'], txt['no']])
 
     st.session_state.age_val = age
     st.session_state.height_val = height
     st.session_state.weight_val = weight
+    st.session_state.birth_weight_val = birth_weight
+    st.session_state.asi_val = asi_str
 
     gender_val = 1 if gender_str == txt['male'] else 0
     asi_val = 1 if asi_str == txt['yes'] else 0
@@ -437,17 +544,10 @@ with tab1:
             fig_gauge.update_layout(height=220, paper_bgcolor="rgba(0,0,0,0)", font={'color': "white"})
             st.plotly_chart(fig_gauge, use_container_width=True)
 
-        if z_score < -2:
-            action_items = [
-                "INTERVENSI MEDIS SEGERA: Konsultasikan ke Dokter Spesialis atau Puskesmas setempat.",
-                "DOSIS PROTEIN HEWANI TINGGI: Berikan minimal 3 porsi protein hewani berkonsentrasi tinggi per hari (contoh: 1 butir telur puyuh + 50g hati ayam/ikan).",
-                "SUPLEMENTASI ZAT BESI: Minta resep sirup/tablet zat besi dan suplemen vitamin dari faskes."
-            ]
-        else:
-            action_items = [
-                "PERTAHANKAN NUTRISI IDEAL: Berikan 2-3 porsi protein bervariasi setiap hari.",
-                "PEMANTAUAN RUTIN: Ukur tinggi dan berat badan secara teratur untuk memantau kurva kembang."
-            ]
+        # ACTION PLAN SPESIFIK & BERVARIAI MEDIS
+        dynamic_actions = generate_dynamic_action_plan(
+            st.session_state.age_category, age, height, weight, z_score, who_status, birth_weight, asi_str
+        )
 
         # KARTU LAPORAN VISUAL DI HALAMAN UTAMA (TERISI UTUH)
         report_html = f"""
@@ -471,7 +571,7 @@ with tab1:
             <br>
             <h4>{txt['report_sub3']}</h4>
             <ul>
-                {"".join([f"<li>{item}</li>" for item in action_items])}
+                {"".join([f"<li>{item}</li>" for item in dynamic_actions])}
             </ul>
             <br>
             <p style="font-size: 11px; color: #64748B; font-style: italic;">{txt['report_note']}</p>
@@ -480,8 +580,16 @@ with tab1:
         st.markdown(report_html, unsafe_allow_html=True)
         
         st.write("")
-        st.button(txt['print_btn'], on_click=lambda: st.components.v1.html("<script>window.print();</script>"))
-        st.success(f"📧 Laporan rekam medis otomatis terverifikasi untuk email: **{st.session_state.user_email}**")
+        c_pdf1, c_pdf2 = st.columns(2)
+        with c_pdf1:
+            pdf_link_html = create_pdf_download_link(
+                st.session_state.user_name, st.session_state.user_email, st.session_state.age_category,
+                age, gender_str, height, weight, birth_weight, asi_str, z_score, who_status, dynamic_actions
+            )
+            st.markdown(pdf_link_html, unsafe_allow_html=True)
+        with c_pdf2:
+            if st.button(txt['email_btn']):
+                st.success(f"📧 Laporan rekam medis terverifikasi dan otomatis siap dikirimkan ke: **{st.session_state.user_email}**!")
 
         st.write("---")
         st.markdown(f"### {txt['xai_title']}")
@@ -594,7 +702,7 @@ with tab3:
         ]
     elif "Anak-Anak" in cat_recipe:
         recipes = [
-            ("Senin", "🍱 Bento Nasi Kuning Ayam Popcorn & Telur", "Bahan: Nasi Kuning, Dada Ayam Potong Dadu, 1 Telur Rebus, Wortel.\n\nTutorial:\n1. Goreng dada ayam tepung crispy.\n2. Cetak nasi kuning dan hias bersama potongan telur rebus & wortel."),
+            ("Senin", "弁当 Bento Nasi Kuning Ayam Popcorn & Telur", "Bahan: Nasi Kuning, Dada Ayam Potong Dadu, 1 Telur Rebus, Wortel.\n\nTutorial:\n1. Goreng dada ayam tepung crispy.\n2. Cetak nasi kuning dan hias bersama potongan telur rebus & wortel."),
             ("Selasa", "🍝 Spaghetti Salmon Bolognese", "Bahan: Pasta Spaghetti, Fillet Salmon Cincang, Saus Tomat Homemade.\n\nTutorial:\n1. Rebus spaghetti al dente.\n2. Tumis salmon cincang dengan saus tomat lalu siram di atas pasta."),
             ("Rabu", "🍲 Sup Makaroni Daging Sapi & Buncis", "Bahan: Daging Sapi Cincang, Makaroni, Buncis, Wortel, Kaldu Sapi.\n\nTutorial:\n1. Rebus daging sapi dan makaroni hingga empuk.\n2. Masukkan sayuran buncis & wortel dalam kuah kaldu gizi."),
             ("Kamis", "🍳 Nasi Goreng Telur Puyuh & Udang", "Bahan: Nasi Putih, 4 Telur Puyuh, Udang Kupas, Minyak Wijen.\n\nTutorial:\n1. Tumis udang kupas dan telur puyuh orak-arik.\n2. Masukkan nasi dan bumbui ringan tanpa pengawet."),
@@ -707,7 +815,6 @@ with tab5:
     st.markdown(f"### {txt['chat_title']}")
     st.caption(f"Ruang Diskusi & Konsultasi Interaktif Pakar Medis Gizi Balita & Lintas Usia ({st.session_state.age_category}):")
 
-    # CLEAN STREAMLIT CHAT MESSAGE
     for msg in st.session_state.chat_messages:
         with st.chat_message(msg["role"]):
             st.write(msg["content"])
@@ -715,7 +822,7 @@ with tab5:
     if prompt := st.chat_input("Ketik pertanyaan konsultasi di sini (misal: 'Anak saya ga suka makan ikan, alternatifnya apa?')..."):
         st.session_state.chat_messages.append({"role": "user", "content": prompt})
         
-        bot_reply = generate_bot_response(
+        bot_reply = generate_smart_ai_response(
             prompt, st.session_state.user_name, st.session_state.age_category, st.session_state.age_val, 
             st.session_state.height_val, st.session_state.weight_val
         )
