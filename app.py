@@ -13,13 +13,13 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Styling CSS Modern dengan Background Animasi Bayi Colorful
+# 2. Styling CSS Modern dengan Background Gambar Pinterest
 st.markdown("""
 <style>
-    /* Background Animasi Bayi dengan Overlap Gelap Transparan */
+    /* Background Animasi Anak-Anak dari Pinterest */
     .stApp {
-        background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), 
-                    url('https://img.freepik.com/free-vector/cute-baby-pattern-background_23-2148154101.jpg');
+        background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), 
+                    url('https://i.pinimg.com/736x/17/74/9b/17749bb409215fba73f59778ff3bb6be.jpg');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
