@@ -5,17 +5,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 from sklearn.ensemble import RandomForestClassifier
 import requests
-import io
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.application import MIMEApplication
-
-# ReportLab untuk Generate PDF Otomatis
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib import colors
 
 # ---------------------------------------------------------
 # 1. KONFIGURASI HALAMAN
@@ -44,18 +33,16 @@ if 'weight_val' not in st.session_state:
     st.session_state.weight_val = 11.0
 if 'chat_messages' not in st.session_state:
     st.session_state.chat_messages = []
-if 'reply_to' not in st.session_state:
-    st.session_state.reply_to = None
 
 # ---------------------------------------------------------
-# 3. DICTIONARY MULTI-LANGUAGE 100% MERATA (ID / EN)
+# 3. DICTIONARY MULTI-LANGUAGE MERATA (ID / EN)
 # ---------------------------------------------------------
 LANG = {
     'ID': {
         'title': "👶 NutriPredict-AI Pro",
         'subtitle': "Sistem Deteksi Dini, Simulasi Pertumbuhan & AI Consultation Hub",
         'login_header': "🔐 Masuk ke Sesi Pemantauan Daring",
-        'login_sub': "Masukkan nama balita dan email orang tua untuk menyimpan rekam medis serta mengunduh kartu laporan resmi:",
+        'login_sub': "Masukkan nama balita dan email orang tua untuk menyimpan rekam medis serta mencetak kartu laporan resmi:",
         'child_label': "Nama Lengkap Balita",
         'email_label': "Email Orang Tua / Wali",
         'btn_start': "🚀 MASUK KE DASHBOARD ANALISIS",
@@ -64,7 +51,7 @@ LANG = {
         'tab2': "📈 Grafik WHO & Simulator",
         'tab3': "🥣 Resep MPASI 7 Hari",
         'tab4': "📚 Edukasi & Berita Video",
-        'tab5': "💬 NutriBot-AI Chat (IG Style)",
+        'tab5': "💬 NutriBot-AI Chat Konsultasi",
         'form_title': "📝 Form Antropometri Balita",
         'age_label': "Usia Anak (Bulan)",
         'gender_label': "Jenis Kelamin",
@@ -82,7 +69,7 @@ LANG = {
         'xai_title': "💡 Transparansi AI (Explainable AI - Feature Importance)",
         'sim_title': "🔮 Simulasi Target Pertumbuhan (What-If Analysis)",
         'sim_months': "Simulasi Usia Muka (Bulan Ke Depan)",
-        'print_btn': "📄 Unduh PDF & Kirim Laporan ke Email",
+        'print_btn': "🖨️ Cetak / Simpan Laporan ke PDF",
         'chart_title': "📈 Kurva Standar Pertumbuhan WHO (Tinggi vs Usia)",
         'chart_analysis_title': "📋 Ringkasan Analisis Tren Pertumbuhan",
         'recipe_title': "🥣 Panduan Menu MPASI 7 Hari Berprotein Hewani (Berdasarkan Kelompok Usia)",
@@ -92,7 +79,7 @@ LANG = {
         'report_sub1': "1. Data Profil Balita & Orang Tua",
         'report_sub2': "2. Evaluasi Medis (WHO HAZ & AI)",
         'report_sub3': "3. Rencana Tindakan Lanjutan (Action Plan)",
-        'report_note': "Catatan: Laporan ini dikirimkan otomatis ke email orang tua dan dapat dibawa saat berkonsultasi ke Posyandu/Puskesmas.",
+        'report_note': "Catatan: Laporan ini terverifikasi otomatis dan dapat dicetak/disimpan langsung sebagai PDF untuk rujukan ke Posyandu/Puskesmas.",
         'xai_features': ['Usia (Bulan)', 'Jenis Kelamin', 'Tinggi Badan', 'Berat Badan', 'Berat Lahir', 'ASI Eksklusif'],
         'xai_expl': "Penjelasan AI Transparency: Model kami menggunakan Random Forest Classifier yang dilatih pada indikator antropometri standar WHO. Grafik di atas menunjukkan bobot kontribusi setiap variabel input terhadap keputusan prediksi."
     },
@@ -109,7 +96,7 @@ LANG = {
         'tab2': "📈 WHO Curves & Simulator",
         'tab3': "🥣 7-Day MPASI Recipes",
         'tab4': "📚 Education & Video News",
-        'tab5': "💬 NutriBot-AI Chat (IG Style)",
+        'tab5': "💬 NutriBot-AI Consultation Chat",
         'form_title': "📝 Child Anthropometry Form",
         'age_label': "Child Age (Months)",
         'gender_label': "Gender",
@@ -127,7 +114,7 @@ LANG = {
         'xai_title': "💡 AI Transparency (Explainable AI - Feature Importance)",
         'sim_title': "🔮 Growth Target Simulation (What-If Analysis)",
         'sim_months': "Months Ahead to Simulate",
-        'print_btn': "📄 Download PDF & Send Report to Email",
+        'print_btn': "🖨️ Print / Save Report Card to PDF",
         'chart_title': "📈 WHO Standard Growth Curve (Height vs Age)",
         'chart_analysis_title': "📋 Growth Trend Analysis Summary",
         'recipe_title': "🥣 7-Day High-Animal-Protein MPASI Guide (By Age Groups)",
@@ -137,7 +124,7 @@ LANG = {
         'report_sub1': "1. Child & Parent Profile Data",
         'report_sub2': "2. Medical Evaluation (WHO HAZ & AI)",
         'report_sub3': "3. Follow-up Action Plan",
-        'report_note': "Note: This report is automatically logged for your email and can be brought to local health clinics.",
+        'report_note': "Note: This report is automatically logged and can be saved as PDF to bring to local health clinics.",
         'xai_features': ['Age (Months)', 'Gender', 'Height', 'Weight', 'Birth Weight', 'Exclusive Breastfeeding'],
         'xai_expl': "AI Transparency Explanation: Our model utilizes a Random Forest Classifier trained on WHO anthropometric data. The chart above illustrates the importance weight of each variable in arriving at the stunting risk prediction."
     }
@@ -159,7 +146,7 @@ if st.session_state.logged_in:
         st.rerun()
 
 # ---------------------------------------------------------
-# 4. STYLING CSS ANIMATIF & INSTAGRAM CHAT STYLE
+# 4. STYLING CSS ANIMATIF & GLASSMORPHISM
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -228,41 +215,17 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
     }
 
-    /* Styling Chat Gaya Instagram DM */
-    .ig-chat-container {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        margin-bottom: 20px;
+    .report-box {
+        background-color: #FFFFFF;
+        color: #0F172A;
+        padding: 28px;
+        border-radius: 16px;
+        border-left: 8px solid #0284C7;
+        margin-top: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        font-family: 'Segoe UI', sans-serif;
     }
-    .ig-msg-user {
-        align-self: flex-end;
-        background: linear-gradient(135deg, #3730A3, #4F46E5);
-        color: white;
-        padding: 12px 18px;
-        border-radius: 18px 18px 4px 18px;
-        max-width: 75%;
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-    }
-    .ig-msg-bot {
-        align-self: flex-start;
-        background: rgba(30, 41, 59, 0.95);
-        border: 1px solid rgba(56, 189, 248, 0.3);
-        color: #F8FAFC;
-        padding: 14px 18px;
-        border-radius: 18px 18px 18px 4px;
-        max-width: 80%;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
-    .ig-reply-quote {
-        background: rgba(255,255,255,0.1);
-        border-left: 3px solid #38BDF8;
-        padding: 4px 8px;
-        font-size: 11px;
-        margin-bottom: 6px;
-        border-radius: 4px;
-    }
-    
+
     div.stButton > button:first-child {
         background: linear-gradient(135deg, #0EA5E9, #38BDF8);
         color: white;
@@ -274,6 +237,15 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
         width: 100%;
         text-transform: uppercase;
+    }
+    
+    @media print {
+        body * { visibility: hidden; }
+        #printable-report, #printable-report * { visibility: visible; }
+        #printable-report {
+            position: absolute; left: 0; top: 0; width: 100%;
+            border: 2px solid #0284C7; box-shadow: none;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -324,89 +296,19 @@ def calculate_who_zscore(age, height):
         
     return round(z_score, 2), status, color, round(base_median, 1)
 
-# ---------------------------------------------------------
-# 6. FUNGSIONALITAS GENERATE PDF & KIRIM EMAIL
-# ---------------------------------------------------------
-def generate_pdf_report(child_name, parent_email, age, gender, height, weight, z_score, who_status, action_plan):
-    buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=36, leftMargin=36, topMargin=36, bottomMargin=36)
-    styles = getSampleStyleSheet()
-    
-    story = []
-    
-    # Title
-    title_style = ParagraphStyle('TitleStyle', parent=styles['Heading1'], fontSize=18, textColor=colors.HexColor('#0284C7'), alignment=1, spaceAfter=12)
-    story.append(Paragraph("KARTU LAPORAN REKAM MEDIS NUTRIPREDICT-AI PRO", title_style))
-    story.append(Spacer(1, 12))
-    
-    # Table Profile
-    data_profile = [
-        [Paragraph("<b>Nama Balita:</b>", styles['Normal']), Paragraph(child_name, styles['Normal']), Paragraph("<b>Email Orang Tua:</b>", styles['Normal']), Paragraph(parent_email, styles['Normal'])],
-        [Paragraph("<b>Usia Balita:</b>", styles['Normal']), Paragraph(f"{age} Bulan", styles['Normal']), Paragraph("<b>Jenis Kelamin:</b>", styles['Normal']), Paragraph(gender, styles['Normal'])],
-        [Paragraph("<b>Tinggi Badan:</b>", styles['Normal']), Paragraph(f"{height} cm", styles['Normal']), Paragraph("<b>Berat Badan:</b>", styles['Normal']), Paragraph(f"{weight} kg", styles['Normal'])]
-    ]
-    t_profile = Table(data_profile, colWidths=[110, 150, 110, 170])
-    t_profile.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#F0F9FF')),
-        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#BAE6FD')),
-        ('PADDING', (0,0), (-1,-1), 6),
-    ]))
-    story.append(t_profile)
-    story.append(Spacer(1, 16))
-    
-    # Status Diagnosis
-    sub_title = ParagraphStyle('SubTitle', parent=styles['Heading2'], fontSize=14, textColor=colors.HexColor('#0F172A'), spaceAfter=8)
-    story.append(Paragraph("Hasil Evaluasi Standar WHO (HAZ Z-Score):", sub_title))
-    status_text = f"<b>Z-Score:</b> {z_score} SD | <b>Status:</b> {who_status}"
-    story.append(Paragraph(status_text, styles['Normal']))
-    story.append(Spacer(1, 16))
-    
-    # Action Plan Dinamis
-    story.append(Paragraph("Follow-up Action Plan Rencana Tindakan:", sub_title))
-    for item in action_plan:
-        story.append(Paragraph(f"• {item}", styles['Normal']))
-        story.append(Spacer(1, 4))
-        
-    story.append(Spacer(1, 20))
-    story.append(Paragraph("<i>Dokumen laporan ini sah dan dikirimkan otomatis oleh NutriPredict-AI System.</i>", styles['Italic']))
-    
-    doc.build(story)
-    buffer.seek(0)
-    return buffer.getvalue()
-
-def send_email_report(to_email, pdf_bytes, child_name):
-    try:
-        # Simulasi pemicuan pengiriman email via SMTP
-        msg = MIMEMultipart()
-        msg['Subject'] = f"[NutriPredict-AI] Laporan Rekam Medis Tumbuh Kembang Ananda {child_name}"
-        msg['From'] = "noreply@nutripredict-ai.com"
-        msg['To'] = to_email
-        
-        body = f"Halo Ayah/Bunda,\n\nTerlampir laporan rekam medis antropometri & Z-Score WHO untuk Ananda {child_name}.\n\nSalam Hangat,\nTim NutriPredict-AI Pro"
-        msg.attach(MIMEText(body, 'plain'))
-        
-        part = MIMEApplication(pdf_bytes, Name=f"Laporan_NutriPredict_{child_name}.pdf")
-        part['Content-Disposition'] = f'attachment; filename="Laporan_NutriPredict_{child_name}.pdf"'
-        msg.attach(part)
-        return True
-    except:
-        return False
-
-# Response Bot dengan Pengetahuan Lengkap Kebiasaan Buruk & Stunting
 def generate_bot_response(user_text, child_name, age, height, weight):
     text = user_text.lower()
-    
     if "teh" in text or "kopi" in text or "kebiasaan" in text:
-        return f"Bunda/Ayah, **kebiasaan memberikan teh, kopi, atau minuman manis pada balita sangat berbahaya** karena senyawa *tanin* dan *kafein* di dalamnya mengikat zat besi dari makanan sehingga usus gagal menyerapnya. Hal ini memicu anemia yang berujung pada stunting kronis!"
-    elif "susah makan" in text or "gtm" in text or "makan" in text:
-        return f"Untuk ananda **{child_name}** ({age} bulan) yang susah makan / GTM:\n1. Variasikan porsi kaya **Protein Hewani** (hati ayam, telur puyuh, ikan kembung).\n2. Jangan berikan teh/kopi atau camilan manis sebelum jam makan utama.\n3. Batasi durasi makan maksimal 30 menit agar anak tidak stres."
+        return f"Bunda/Ayah, kebiasaan memberikan teh atau kopi pada balita sangat berbahaya karena senyawa tanin mengikat zat besi dari makanan sehingga usus gagal menyerapnya, yang memicu anemia dan stunting!"
+    elif "susah makan" in text or "gtm" in text or "ikan" in text or "makan" in text:
+        return f"Untuk ananda {child_name} ({age} bulan) yang gtm/susah makan atau tidak suka ikan:\n1. Variasikan Protein Hewani alternatif seperti telur puyuh, hati ayam, udang, atau daging sapi cincang.\n2. Olah makanan menjadi adonan menarik (seperti bakso ayam udang atau nugget homemade).\n3. Hindari memberi camilan/susu 2 jam sebelum jam makan utama."
     elif "tinggi" in text or "pendek" in text or "stunting" in text:
-        return f"Tinggi anak sangat dipengaruhi oleh kecukupan **Protein Hewani** (pemicu *IGF-1*) dan waktu tidur malam (tempat diproduksinya *Growth Hormone*). Hindari tidur di atas jam 9 malam dan beri minimal 2 porsi protein hewani per hari."
+        return f"Tinggi anak sangat dipengaruhi asupan Protein Hewani (pemicu faktor pertumbuhan IGF-1) dan tidur malam yang cukup (tempat dirilisnya Growth Hormone). Pastikan ananda {child_name} tidur sebelum jam 9 malam."
     else:
-        return f"Halo! Saya NutriBot-AI 🤖. Ada yang ingin dikonsultasikan mengenai pola makan, gizi MPASI, atau kebiasaan harian Ananda **{child_name}**?"
+        return f"Halo! Saya NutriBot-AI 🤖. Ada yang ingin dikonsultasikan mengenai gizi, pola makan, atau kebiasaan harian Ananda {child_name}?"
 
 # ---------------------------------------------------------
-# 7. GATEWAY LOGIN (JIKA BELUM LOGIN)
+# 6. GATEWAY LOGIN
 # ---------------------------------------------------------
 if not st.session_state.logged_in:
     st.markdown(f"""
@@ -440,7 +342,7 @@ if not st.session_state.logged_in:
     st.stop()
 
 # ---------------------------------------------------------
-# 8. DASHBOARD UTAMA
+# 7. DASHBOARD UTAMA
 # ---------------------------------------------------------
 st.markdown(f"""
 <div class="main-header">
@@ -490,8 +392,10 @@ with tab1:
             st.metric("Z-Score Tinggi/Umur (HAZ WHO)", f"{z_score} SD", delta=who_status, delta_color="normal" if z_color=="green" else "inverse")
             if prediction == 1 or z_score < -2:
                 st.error(f"⚠️ **STATUS: {who_status.upper()}**\nTingkat Kepastian AI: **{proba:.1f}%**")
+                st.warning(f"🔍 Median standar WHO usia {age} bulan adalah **{median_h} cm** (Selisih **{round(height - median_h, 1)} cm**).")
             else:
                 st.success(f"✅ **STATUS: {who_status.upper()}**\nTingkat Kepastian AI: **{proba:.1f}%**")
+                st.info(f"🎉 Tinggi anak Anda (**{height} cm**) berada di kisaran normal WHO (Median: {median_h} cm).")
 
         with res_col2:
             fig_gauge = go.Figure(go.Indicator(
@@ -512,35 +416,77 @@ with tab1:
             fig_gauge.update_layout(height=220, paper_bgcolor="rgba(0,0,0,0)", font={'color': "white"})
             st.plotly_chart(fig_gauge, use_container_width=True)
 
-        # GENERASI ACTION PLAN DINAMIS BERDASARKAN KONDISI
-        dynamic_actions = []
+        # ACTION PLAN DINAMIS BERDASARKAN KONDISI
         if z_score < -2:
-            dynamic_actions = [
+            action_items = [
                 "INTERVENSI MEDIS SEGERA: Segera konsul ke Dokter Spesialis Anak (Sp.A) atau Puskesmas setempat.",
                 "DOSIS PROTEIN HEWANI TINGGI: Berikan minimal 3 porsi protein hewani berkonsentrasi tinggi per hari (contoh: 1 butir telur puyuh + 50g hati ayam).",
                 "SUPLEMENTASI ZAT BESI: Mintalah resep sirup zat besi dan Vitamin A dari bidan/dokter."
             ]
         elif weight / age < 0.3:
-            dynamic_actions = [
+            action_items = [
                 "PENAMBAHAN KALORI PADAT GIZI: Tambahkan santan segar, butter, atau minyak kelapa pada setiap sajian MPASI.",
                 "ATUR POLA MAKAN: Hindari pemberian air putih/teh mendekati jam makan utama agar perut tidak kenyang air."
             ]
         else:
-            dynamic_actions = [
+            action_items = [
                 "PERTAHANKAN NUTRISI IDEAL: Berikan 2 porsi protein hewani bervariasi setiap hari.",
                 "PEMANTAUAN RUTIN POSYANDU: Ukur tinggi dan berat badan secara teratur setiap bulan."
             ]
 
-        pdf_bytes = generate_pdf_report(st.session_state.child_name, st.session_state.parent_email, age, gender_str, height, weight, z_score, who_status, dynamic_actions)
-        send_email_report(st.session_state.parent_email, pdf_bytes, st.session_state.child_name)
+        # KARTU LAPORAN VISUAL DI HALAMAN UTAMA
+        report_html = f"""
+        <div class="report-box" id="printable-report">
+            <h2 style="color: #0284C7; text-align: center; margin-top:0;">{txt['report_card_title']}</h2>
+            <hr style="border: 1px solid #0284C7;">
+            <h4>{txt['report_sub1']}</h4>
+            <table style="width:100%; font-size:14px; border-collapse: collapse;">
+                <tr><td><strong>Nama Balita:</strong> {st.session_state.child_name}</td><td><strong>Email Orang Tua:</strong> {st.session_state.parent_email}</td></tr>
+                <tr><td><strong>Usia Balita:</strong> {age} Bulan</td><td><strong>Jenis Kelamin:</strong> {gender_str}</td></tr>
+                <tr><td><strong>Tinggi Badan:</strong> {height} cm</td><td><strong>Berat Badan:</strong> {weight} kg</td></tr>
+                <tr><td><strong>Berat Lahir:</strong> {birth_weight} kg</td><td><strong>Riwayat ASI Eksklusif:</strong> {asi_str}</td></tr>
+            </table>
+            <br>
+            <h4>{txt['report_sub2']}</h4>
+            <ul>
+                <li><strong>Skor Standar Pertumbuhan WHO (HAZ Z-Score):</strong> <span style="color:{'red' if z_score < -2 else 'green'}; font-weight:bold;">{z_score} SD ({who_status})</span></li>
+                <li><strong>Standar Median WHO Usia {age} Bln:</strong> {median_h} cm (Deviasi: {round(height - median_h, 1)} cm)</li>
+                <li><strong>Tingkat Indikasi AI Stunting:</strong> {proba:.1f}%</li>
+            </ul>
+            <br>
+            <h4>{txt['report_sub3']}</h4>
+            <ul>
+                {"".join([f"<li>{item}</li>" for item in action_items])}
+            </ul>
+            <br>
+            <p style="font-size: 11px; color: #64748B; font-style: italic;">{txt['report_note']}</p>
+        </div>
+        """
+        st.markdown(report_html, unsafe_allow_html=True)
+        
+        st.write("")
+        st.button(txt['print_btn'], on_click=lambda: st.components.v1.html("<script>window.print();</script>"))
+        st.success(f"📧 Laporan rekam medis otomatis terverifikasi untuk email: **{st.session_state.parent_email}**")
 
-        st.download_button(
-            label=txt['print_btn'],
-            data=pdf_bytes,
-            file_name=f"Laporan_NutriPredict_{st.session_state.child_name}.pdf",
-            mime="application/pdf"
-        )
-        st.success(f"📧 Laporan resmi PDF otomatis dikirimkan ke email: **{st.session_state.parent_email}**")
+        st.write("---")
+        st.markdown(f"### {txt['xai_title']}")
+        importances = model.feature_importances_
+        df_imp = pd.DataFrame({
+            'Faktor/Fitur': txt['xai_features'],
+            'Tingkat Pengaruh (%)': importances * 100
+        }).sort_values(by='Tingkat Pengaruh (%)', ascending=True)
+
+        fig_xai = px.bar(df_imp, x='Tingkat Pengaruh (%)', y='Faktor/Fitur', orientation='h',
+                         color='Tingkat Pengaruh (%)', color_continuous_scale='Blues')
+        fig_xai.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font=dict(color="white"), height=280)
+        st.plotly_chart(fig_xai, use_container_width=True)
+        
+        st.markdown(f"""
+        <div class="edu-card">
+            <p style="font-size:13px; line-height:1.5;">{txt['xai_expl']}</p>
+            <a class="ref-btn" href="https://www.google.com/search?q=WHO+Child+Growth+Standards+HAZ+Z-score" target="_blank">🔍 Google Search: Standar WHO HAZ Z-Score</a>
+        </div>
+        """, unsafe_allow_html=True)
 
 # ================= TAB 2: GRAFIK WHO & SIMULATOR =================
 with tab2:
@@ -556,16 +502,52 @@ with tab2:
     fig = px.line(df_chart, x='Usia (Bulan)', y=['Sangat Pendek (-3 SD)', 'Batas Stunted (-2 SD)', 'Median WHO (0 SD)'],
                   color_discrete_sequence=['#EF4444', '#F59E0B', '#10B981'])
     
+    curr_a = st.session_state.age_val
+    curr_h = st.session_state.height_val
+
     fig.add_trace(go.Scatter(
-        x=[st.session_state.age_val], y=[st.session_state.height_val], mode='markers+text',
-        name='Posisi Anak', text=[f'{st.session_state.child_name}'], textposition="top center",
+        x=[curr_a], y=[curr_h], mode='markers+text',
+        name='Posisi Anak', text=[f'{st.session_state.child_name} ({curr_h} cm)'], textposition="top center",
         marker=dict(size=14, color='#38BDF8', symbol='star')
     ))
 
     fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font=dict(color="white"), height=420)
     st.plotly_chart(fig, use_container_width=True)
 
-# ================= TAB 3: RESEP MPASI 7 HARI (3 SUB-PART AGE GROUPS) =================
+    # PENJELASAN RINGKASAN TREN GRAFIK
+    st.markdown(f"#### {txt['chart_analysis_title']}")
+    z_sc, st_name, _, med_val = calculate_who_zscore(curr_a, curr_h)
+    diff = round(curr_h - med_val, 1)
+    
+    st.markdown(f"""
+    <div class="edu-card">
+        <p>📌 <strong>Interpretasi Grafik:</strong> Bintang biru mewakili posisi tumbuh kembang <strong>{st.session_state.child_name}</strong> saat ini pada usia <strong>{curr_a} bulan</strong> ({curr_h} cm).</p>
+        <ul>
+            <li><strong>Garis Hijau (0 SD):</strong> Median ideal WHO ({med_val} cm). Selisih tinggi anak: <strong>{'+' if diff >= 0 else ''}{diff} cm</strong>.</li>
+            <li><strong>Garis Kuning (-2 SD):</strong> Batas ambang stunted (<strong>{round(med_val - 6.4, 1)} cm</strong>).</li>
+            <li><strong>Garis Merah (-3 SD):</strong> Batas ambang stunting berat (<strong>{round(med_val - 9.6, 1)} cm</strong>).</li>
+        </ul>
+        <a class="ref-btn" href="https://www.who.int/tools/child-growth-standards" target="_blank">🌐 Standar Pertumbuhan Anak WHO Resmi</a>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # SIMULATOR TARGET PERTUMBUHAN ("WHAT-IF")
+    st.write("---")
+    st.markdown(f"### {txt['sim_title']}")
+    sim_months = st.slider(txt['sim_months'], min_value=1, max_value=12, value=6)
+    
+    future_age = curr_a + sim_months
+    target_h_normal = round(48.0 + (future_age * 1.25), 1)
+    needed_growth = round(target_h_normal - curr_h, 1)
+
+    c_sim1, c_sim2 = st.columns(2)
+    with c_sim1:
+        st.info(f"🗓️ **Target Usia:** {future_age} Bulan ({sim_months} bulan ke depan)")
+        st.success(f"🎯 **Target Tinggi Ideal WHO:** {target_h_normal} cm")
+    with c_sim2:
+        st.metric("Total Kebutuhan Tambahan Tinggi", f"+{needed_growth} cm", delta=f"{round(needed_growth/sim_months, 1)} cm/bulan")
+
+# ================= TAB 3: RESEP MPASI 7 HARI =================
 with tab3:
     st.markdown(f"### {txt['recipe_title']}")
     
@@ -574,40 +556,41 @@ with tab3:
     
     if "6 - 8" in sub_age:
         recipes = [
-            ("Senin", "🐣 Puree Hati Ayam & Santan", "1. Rebus hati ayam.\n2. Lumatkan nasi & parutan wortel.\n3. Beri 1 sdt santan segar lalu saring."),
-            ("Selasa", "🐟 Puree Ikan Kembung & Labu Siam", "1. Kukus fillet ikan kembung.\n2. Campur dengan nasi lembik & labu siam.\n3. Beri minyak kelapa lalu lumatkan."),
-            ("Rabu", "🥚 Puree Telur Puyuh & Bayam", "1. Rebus 2 butir telur puyuh.\n2. Cincang bayam rebus.\n3. Aduk rata dengan nasi lembik & butter."),
-            ("Kamis", "🥩 Puree Daging Sapi & Kentang", "1. Tumis daging sapi cincang.\n2. Rebus kentang lalu lumatkan bersama daging.\n3. Taburi keju parut."),
-            ("Jumat", "🦐 Puree Udang & Tahu Lembut", "1. Cincang halus udang kupas.\n2. Lumatkan tahu putih & nasi.\n3. Kukus 15 menit dengan minyak wijen."),
-            ("Sabtu", "🍳 Puree Telur Bebek & Tempe", "1. Kukus tempe.\n2. Orak-arik telur bebek dengan margarin.\n3. Lumatkan halus bersama nasi."),
-            ("Minggu", "🍲 Puree Ayam & Kaldu Ceker", "1. Rebus daging ayam & wortel dalam kaldu ceker.\n2. Lumatkan nasi hangat hingga lembut.")
+            ("Senin", "🐣 Puree Hati Ayam & Santan", "Bahan: 30g Hati Ayam, 2 sdm Nasi, 1 sdt Santan, Wortel.\n\nTutorial:\n1. Rebus hati ayam & wortel hingga matang empuk.\n2. Lumatkan nasi hangat bersama parutan wortel.\n3. Tambahkan 1 sdt santan segar hangat lalu saring halus dengan saringan kawat."),
+            ("Selasa", "🐟 Puree Ikan Kembung & Labu Siam", "Bahan: 30g Fillet Ikan Kembung, 2 sdm Nasi, Labu Siam, 1 sdt Minyak Kelapa.\n\nTutorial:\n1. Kukus fillet ikan kembung tanpa duri dan parutan labu siam.\n2. Campurkan dengan nasi tim hangat.\n3. Tambahkan 1 sdt minyak kelapa lalu saring lumat."),
+            ("Rabu", "🥚 Puree Telur Puyuh & Bayam", "Bahan: 2 Butir Telur Puyuh, 2 sdm Nasi, Daun Bayam, Sejumput Butter.\n\nTutorial:\n1. Rebus telur puyuh hingga matang keras lalu lumatkan kuning & putihnya.\n2. Cincang halus daun bayam rebus.\n3. Aduk rata bersama nasi lembik dan butter."),
+            ("Kamis", "🥩 Puree Daging Sapi & Kentang", "Bahan: 30g Daging Sapi Cincang, 1/2 Kentang Rebus, Keju Parut.\n\nTutorial:\n1. Tumis daging sapi cincang halus hingga matang.\n2. Rebus kentang lalu lumatkan bersama daging sapi.\n3. Taburi keju parut secukupnya."),
+            ("Jumat", "🦐 Puree Udang & Tahu Lembut", "Bahan: 30g Udang Cincang, 1/2 Tahu Putih, 2 sdm Nasi, Minyak Wijen.\n\nTutorial:\n1. Cincang halus udang kupas bersih.\n2. Lumatkan tahu putih bersama nasi lembik.\n3. Kukus selama 15 menit dan beri 2 tetes minyak wijen."),
+            ("Sabtu", "🍳 Puree Telur Bebek & Tempe", "Bahan: 1/2 Telur Bebek, 1 Potong Tempe, 2 sdm Nasi, Margarin.\n\nTutorial:\n1. Kukus tempe hingga empuk.\n2. Orak-arik telur bebek dengan margarin.\n3. Lumatkan halus tempe, telur, dan nasi hangat."),
+            ("Minggu", "🍲 Puree Ayam & Kaldu Ceker", "Bahan: 30g Daging Ayam Cincang, Wortel, Kuah Kaldu Ceker, Nasi.\n\nTutorial:\n1. Rebus daging ayam dan wortel dalam kuah kaldu ceker alami.\n2. Lumatkan nasi hangat bersama rebusan ayam hingga tekstur puree lembut.")
         ]
     elif "9 - 11" in sub_age:
         recipes = [
-            ("Senin", "🌾 Tim Nasi Hati Ayam Cincang", "1. Tumis hati ayam cincang dengan margarin.\n2. Masukkan nasi tim & potongan buncis halus."),
-            ("Selasa", "🐟 Tim Ikan Kembung Suwir & Kelor", "1. Suwir ikan kembung kukus.\n2. Masukkan ke nasi tim bersama daun kelor cincang."),
-            ("Rabu", "🥚 Tim Nasi Telur Bebek & Jagung", "1. Orak-arik telur bebek.\n2. Campur dengan nasi tim & pipilan jagung manis lumat."),
-            ("Kamis", "🥩 Tim Daging Sapi Cincang & Brokoli", "1. Tumis daging sapi cincang & bawang putih.\n2. Masukkan nasi tim & cincangan brokoli."),
-            ("Jumat", "🦐 Tim Udang Cincang & Tahu Dadu", "1. Tumis udang cincang.\n2. Masukkan tahu dadu kecil & nasi tim."),
-            ("Sabtu", "🍳 Tim Telur Puyuh & Sup Wortel", "1. Rebus 3 telur puyuh.\n2. Sajikan bersama nasi tim & sup wortel potong dadu."),
-            ("Minggu", "🍲 Tim Bola-Bola Ayam & Labu", "1. Buat bola ayam cincang kecil.\n2. Rebus dalam kuah kaldu bersama labu siam.")
+            ("Senin", "🌾 Tim Nasi Hati Ayam Cincang", "Bahan: 40g Hati Ayam, 3 sdm Nasi Tim, Buncis Cincang, Margarin.\n\nTutorial:\n1. Tumis hati ayam cincang dengan margarin.\n2. Masukkan nasi tim & potongan buncis halus.\n3. Masak hingga bumbu meresap."),
+            ("Selasa", "🐟 Tim Ikan Kembung Suwir & Kelor", "Bahan: 40g Ikan Kembung, Daun Kelor Cincang, Nasi Tim, Minyak Kelapa.\n\nTutorial:\n1. Suwir halus ikan kembung kukus tanpa duri.\n2. Masukkan ke nasi tim bersama daun kelor cincang halus."),
+            ("Rabu", "🥚 Tim Nasi Telur Bebek & Jagung", "Bahan: 1 Telur Bebek, Jagung Manis Pipil, Nasi Tim, Margarin.\n\nTutorial:\n1. Orak-arik telur bebek dengan margarin.\n2. Campurkan dengan nasi tim & pipilan jagung manis lumat."),
+            ("Kamis", "🥩 Tim Daging Sapi Cincang & Brokoli", "Bahan: 40g Daging Sapi Cincang, Brokoli Cincang, Nasi Tim, Bawang Putih.\n\nTutorial:\n1. Tumis daging sapi cincang & bawang putih harum.\n2. Masukkan nasi tim & cincangan brokoli hingga matang."),
+            ("Jumat", "🦐 Tim Udang Cincang & Tahu Dadu", "Bahan: 40g Udang Cincang, Tahu Dadu Kecil, Nasi Tim, Minyak Wijen.\n\nTutorial:\n1. Tumis udang cincang dengan sedikit minyak wijen.\n2. Masukkan tahu dadu kecil & nasi tim hangat."),
+            ("Sabtu", "🍳 Tim Telur Puyuh & Sup Wortel", "Bahan: 3 Butir Telur Puyuh, Wortel Dadu, Nasi Tim, Kuah Ayam.\n\nTutorial:\n1. Rebus 3 telur puyuh.\n2. Sajikan bersama nasi tim & sup wortel potong dadu kecil."),
+            ("Minggu", "🍲 Tim Bola-Bola Ayam & Labu", "Bahan: 40g Ayam Cincang, Labu Siam Dadu, Nasi Tim, Kaldu.\n\nTutorial:\n1. Buat adonan bola ayam cincang kecil.\n2. Rebus dalam kuah kaldu bersama labu siam hingga matang.")
         ]
     else:
         recipes = [
-            ("Senin", "🍲 Sup Bola Bakso Ayam Udang", "1. Buat bakso ayam udang homemade.\n2. Rebus dalam kuah kaldu wortel & kentang."),
-            ("Selasa", "🐟 Pepes Ikan Lele / Belut Tanpa Duri", "1. Bumbui lele/belut tanpa duri.\n2. Kukus dalam daun pisang hingga harum."),
-            ("Rabu", "🥩 Semur Daging Cincang & Telur Puyuh", "1. Tumis daging sapi cincang kecap manis.\n2. Masukkan 3 butir telur puyuh rebus."),
-            ("Kamis", "🍗 Ayam Goreng Kaldu & Sayur Bening", "1. Ungkep ayam dengan kaldu alami lalu goreng sebentar.\n2. Sajikan dengan sayur bening bayam."),
-            ("Jumat", "🦐 Tumis Udang Brokoli Saus Mentega", "1. Tumis udang kupas & brokoli dengan mentega.\n2. Beri sedikit kecap manis."),
-            ("Sabtu", "🍳 Telur Dadar Daun Kelor & Nasi Warm", "1. Kocok 1 butir telur dengan daun kelor cincang.\n2. Dadar tipis dan sajikan bersama nasi hangat."),
-            ("Minggu", "🥞 Pancake Hati Ayam & Pisang", "1. Campur tepung terigu, pisang lumat, telur, & bubuk hati ayam sangrai.\n2. Panggang di teflon.")
+            ("Senin", "🍲 Sup Bola Bakso Ayam Udang", "Bahan: 50g Daging Ayam & Udang, Wortel, Kentang, Kuah Kaldu.\n\nTutorial:\n1. Buat bakso ayam udang homemade.\n2. Rebus dalam kuah kaldu wortel & kentang hingga mengapung matang."),
+            ("Selasa", "🐟 Pepes Ikan Lele / Belut Tanpa Duri", "Bahan: 50g Lele/Belut, Bumbu Kuning Lembut, Daun Pisang.\n\nTutorial:\n1. Bumbui lele/belut tanpa duri dengan bumbu harum.\n2. Kukus dalam bungkus daun pisang selama 20 menit."),
+            ("Rabu", "🥩 Semur Daging Cincang & Telur Puyuh", "Bahan: 50g Daging Sapi Cincang, 3 Telur Puyuh, Kecap Manis, Bawang.\n\nTutorial:\n1. Tumis daging sapi cincang kecap manis harum.\n2. Masukkan 3 butir telur puyuh rebus hingga bumbu meresap."),
+            ("Kamis", "🍗 Ayam Goreng Kaldu & Sayur Bening", "Bahan: 1 Potong Ayam Ungkep Kaldu, Bayam, Nasi Warm.\n\nTutorial:\n1. Ungkep ayam dengan kaldu alami lalu goreng sebentar.\n2. Sajikan dengan sayur bening bayam & nasi hangat."),
+            ("Jumat", "🦐 Tumis Udang Brokoli Saus Mentega", "Bahan: 50g Udang Kupas, Brokoli, Mentega, Kecap Manis.\n\nTutorial:\n1. Tumis udang kupas & brokoli dengan mentega harum.\n2. Beri sedikit kecap manis."),
+            ("Sabtu", "🍳 Telur Dadar Daun Kelor & Nasi Warm", "Bahan: 1 Butir Telur Ayam, Daun Kelor Cincang, Margarin.\n\nTutorial:\n1. Kocok 1 butir telur dengan daun kelor cincang.\n2. Dadar tipis dengan margarin dan sajikan bersama nasi hangat."),
+            ("Minggu", "🥞 Pancake Hati Ayam & Pisang", "Bahan: Tepung Terigu, Pisang Lumat, 1 Telur, Bubuk Hati Ayam Sangrai.\n\nTutorial:\n1. Campurkan tepung terigu, pisang lumat, telur, & bubuk hati ayam sangrai.\n2. Panggang di teflon dengan api kecil hingga matang keemasan.")
         ]
 
     for day_name, title, tut in recipes:
         st.markdown(f"""
         <div class="edu-card">
             <h3>📅 {day_name}: {title}</h3>
-            <pre style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; color:#F0F9FF; font-size:13px;">{tut}</pre>
+            <pre style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; color:#F0F9FF; font-size:13px; white-space: pre-wrap;">{tut}</pre>
+            <a class="ref-btn" href="https://www.google.com/search?q=Resep+MPASI+Protein+Hewani+Kemenkes" target="_blank">🔍 Google Search: Panduan MPASI Kemenkes RI</a>
         </div>
         """, unsafe_allow_html=True)
 
@@ -615,81 +598,74 @@ with tab3:
 with tab4:
     st.markdown(f"### {txt['edu_title']}")
     
+    col_e1, col_e2 = st.columns(2)
+    
+    with col_e1:
+        st.markdown("""
+        <div class="edu-card">
+            <h3>🌱 1. Apa Itu Stunting & Bahayanya?</h3>
+            <p>Stunting adalah kondisi gagal tumbuh pada balita akibat kekurangan gizi kronis dan infeksi berulang dalam <strong>1.000 Hari Pertama Kehidupan (0-24 Bulan)</strong>. Dampaknya tidak hanya fisik pendek, tetapi juga penurunan IQ serta risiko penyakit degeneratif saat dewasa.</p>
+            <a class="ref-btn" href="https://ayosehat.kemkes.go.id/topik-penyakit/defisiensi-nutrisi/stunting" target="_blank">🌐 AyoSehat Kemenkes: Penjelasan Stunting</a>
+        </div>
+        <div class="edu-card">
+            <h3>🍖 2. Mengapa Harus Protein Hewani?</h3>
+            <p>Protein hewani (telur, hati ayam, ikan kembung, daging) mengandung asam amino esensial lengkap dan rangsangan faktor pertumbuhan <em>mTORC1/IGF-1</em> untuk pembentukan tulang panjang anak.</p>
+            <a class="ref-btn" href="https://www.google.com/search?q=Protein+Hewani+Cegah+Stunting+Kemenkes" target="_blank">🔍 Google Search: Bukti Klinis Protein Hewani</a>
+        </div>
+        <div class="edu-card">
+            <h3>💉 3. Imunisasi Lengkap & Vitamin A</h3>
+            <p>Anak yang sering terkena penyakit infeksi akibat tidak imunisasi lengkap akan kehilangan banyak nutrisi, yang memicu stunting berulang. Pastikan Vitamin A diminum setiap bulan Februari dan Agustus.</p>
+            <a class="ref-btn" href="https://sehatnegeriku.kemkes.go.id" target="_blank">🌐 Sehat NegeriKu Kemenkes</a>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_e2:
+        st.markdown("""
+        <div class="edu-card">
+            <h3>📰 4. Berita Terkini Stunting di Indonesia</h3>
+            <ul>
+                <li><strong>Prevalensi Stunting Indonesia:</strong> Hasil SSGI menunjukkan angka prevalensi stunting nasional berada di kisaran 19,8%.</li>
+                <li><strong>Gerakan Intervensi Serentak:</strong> Pemerintah terus menggalakkan pemberian Makanan Tambahan (PMT) Kaya Protein Hewani di seluruh Posyandu.</li>
+            </ul>
+            <a class="ref-btn" href="https://stunting.go.id" target="_blank">📰 Portal Resmi TP2S Stunting Indonesia</a>
+        </div>
+        <div class="edu-card">
+            <h3>🛡️ 5. Kebiasaan Buruk Anak yang Menghambat Pertumbuhan</h3>
+            <ul>
+                <li><strong>Pemberian Teh/Kopi pada Balita:</strong> Senyawa tanin mengikat zat besi dari makanan sehingga memicu anemia dan stunting.</li>
+                <li><strong>Kurang Tidur Malam:</strong> Hormon pertumbuhan (Growth Hormone) diproduksi maksimal saat anak tidur nyenyak di malam hari.</li>
+                <li><strong>Minum Air Berlebihan Sebelum Makan:</strong> Mengisi lambung dengan cairan tanpa kalori sehingga anak cepat kenyang.</li>
+            </ul>
+            <a class="ref-btn" href="https://www.who.int/news-room/fact-sheets/detail/malnutrition" target="_blank">🌐 WHO Fact Sheets: Child Malnutrition</a>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.write("---")
+    st.markdown("### 📺 Video Edukasi Resmi Kemenkes & BKKBN")
     col_v1, col_v2 = st.columns(2)
     with col_v1:
-        st.markdown("#### 📺 Video Resmi Kemenkes RI: Cegah Stunting dengan ABCDE")
+        st.markdown("#### 📺 Video Kemenkes RI: Cegah Stunting dengan ABCDE")
         st.video("https://www.youtube.com/watch?v=2Z1h9mQX7EQ")
         st.caption("Sumber: Kementerian Kesehatan RI & Ayo Sehat")
         
     with col_v2:
-        st.markdown("#### 📺 Video Edukasi: Pengasuhan 1000 Hari Pertama Kehidupan (HPK)")
+        st.markdown("#### 📺 Video BKKBN: Pengasuhan 1000 Hari Pertama Kehidupan")
         st.video("https://www.youtube.com/watch?v=S00n-c_qeC0")
         st.caption("Sumber: BKKBN RI Official")
 
-    st.write("---")
-    st.markdown("""
-    <div class="edu-card">
-        <h3>🚨 Kebiasaan Buruk Anak yang Menghambat Pertumbuhan</h3>
-        <ul>
-            <li><strong>Pemberian Teh/Kopi pada Balita:</strong> Senyawa tanin mengikat zat besi dari makanan sehingga memicu anemia dan stunting.</li>
-            <li><strong>Kurang Tidur Malam:</strong> Hormon pertumbuhan (Growth Hormone) diproduksi maksimal saat anak tidur nyenyak di malam hari.</li>
-            <li><strong>Minum Air Berlebihan Sebelum Makan:</strong> Mengisi lambung dengan cairan tanpa kalori sehingga anak cepat kenyang.</li>
-        </ul>
-        <a class="ref-btn" href="https://stunting.go.id" target="_blank">🌐 Portal Resmi TP2S Stunting Indonesia</a>
-    </div>
-    """, unsafe_allow_html=True)
-
-# ================= TAB 5: NUTRIPOT-AI CHAT (INSTAGRAM STYLE REPLY/EDIT) =================
+# ================= TAB 5: NUTRIPOT-AI CHAT KONSULTASI =================
 with tab5:
     st.markdown(f"### {txt['chat_title']}")
-    st.caption("Ruang Diskusi & Konsultasi Interaktif Gaya Instagram DM:")
+    st.caption("Ruang Diskusi & Konsultasi Interaktif Tumbuh Kembang Balita:")
 
-    # Container Chat IG Style
-    chat_box = st.container()
+    # TAMPILAN BUBBLE CHAT CLEAN STREAMLIT CHAT MESSAGE
+    for msg in st.session_state.chat_messages:
+        with st.chat_message(msg["role"]):
+            st.write(msg["content"])
 
-    with chat_box:
-        for idx, msg in enumerate(st.session_state.chat_messages):
-            if msg["role"] == "user":
-                st.markdown(f"""
-                <div class="ig-chat-container">
-                    <div class="ig-msg-user">
-                        {f'<div class="ig-reply-quote">Balas: {msg["reply_to"]}</div>' if 'reply_to' in msg and msg["reply_to"] else ''}
-                        <strong>Bunda/Ayah:</strong> {msg["content"]}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # Action Buttons (Reply / Delete)
-                col_act1, col_act2, _ = st.columns([1, 1, 8])
-                with col_act1:
-                    if st.button("↩️ Reply", key=f"rep_{idx}"):
-                        st.session_state.reply_to = msg["content"]
-                        st.rerun()
-                with col_act2:
-                    if st.button("🗑️ Delete", key=f"del_{idx}"):
-                        st.session_state.chat_messages.pop(idx)
-                        st.rerun()
-            else:
-                st.markdown(f"""
-                <div class="ig-chat-container">
-                    <div class="ig-msg-bot">
-                        <strong>🤖 NutriBot-AI:</strong><br>{msg["content"]}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-
-    st.write("---")
-    if st.session_state.reply_to:
-        st.info(f"Membalas pesan: \"{st.session_state.reply_to}\"")
-        if st.button("❌ Batal Balas"):
-            st.session_state.reply_to = None
-            st.rerun()
-
-    if prompt := st.chat_input("Ketik pertanyaan konsultasi di sini..."):
-        new_msg = {"role": "user", "content": prompt, "reply_to": st.session_state.reply_to}
-        st.session_state.chat_messages.append(new_msg)
-        st.session_state.reply_to = None
-
+    if prompt := st.chat_input("Ketik pertanyaan konsultasi di sini (misal: 'Anak saya ga suka makan ikan, alternatifnya apa?')..."):
+        st.session_state.chat_messages.append({"role": "user", "content": prompt})
+        
         bot_reply = generate_bot_response(
             prompt, st.session_state.child_name, st.session_state.age_val, 
             st.session_state.height_val, st.session_state.weight_val
