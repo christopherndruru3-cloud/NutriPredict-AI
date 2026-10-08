@@ -16,18 +16,8 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Helper Lottie Animation
-def load_lottieurl(url: str):
-    try:
-        r = requests.get(url, timeout=3)
-        if r.status_code == 200:
-            return r.json()
-    except:
-        return None
-    return None
-
 # ---------------------------------------------------------
-# 2. SESSION STATE LOGIN & DATA BALITA
+# 2. SESSION STATE LOGIN, DATA BALITA & CHAT
 # ---------------------------------------------------------
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
@@ -41,14 +31,16 @@ if 'height_val' not in st.session_state:
     st.session_state.height_val = 75.0
 if 'weight_val' not in st.session_state:
     st.session_state.weight_val = 11.0
+if 'chat_messages' not in st.session_state:
+    st.session_state.chat_messages = []
 
 # ---------------------------------------------------------
-# 3. DICTIONARY MULTI-LANGUAGE MERATA (ID / EN)
+# 3. DICTIONARY MULTI-LANGUAGE (ID / EN)
 # ---------------------------------------------------------
 LANG = {
     'ID': {
         'title': "👶 NutriPredict-AI Pro",
-        'subtitle': "Sistem Deteksi Dini, Simulasi Pertumbuhan & Edukasi Stunting Berbasis AI",
+        'subtitle': "Sistem Deteksi Dini, Simulasi Pertumbuhan & AI Consultation Hub",
         'login_header': "🔐 Masuk ke Sesi Pemantauan Daring",
         'login_sub': "Masukkan nama balita dan email orang tua untuk menyimpan rekam medis serta mencetak kartu laporan daring:",
         'child_label': "Nama Lengkap Balita",
@@ -59,6 +51,7 @@ LANG = {
         'tab2': "📈 Grafik WHO & Simulator",
         'tab3': "🥣 Resep MPASI 7 Hari",
         'tab4': "📚 Edukasi & Berita Stunting",
+        'tab5': "💬 AI Chat Konsultasi",
         'form_title': "📝 Form Antropometri Balita",
         'age_label': "Usia Anak (Bulan)",
         'gender_label': "Jenis Kelamin",
@@ -81,17 +74,18 @@ LANG = {
         'chart_analysis_title': "📋 Ringkasan Analisis Tren Pertumbuhan",
         'recipe_title': "🥣 Panduan Menu MPASI 7 Hari Berprotein Hewani & Tutorial Memasak",
         'edu_title': "📚 Pusat Edukasi & Berita Stunting Terkini Indonesia",
+        'chat_title': "🤖 NutriBot-AI: Konsultasi Tumbuh Kembang & Gizi Balita",
         'report_card_title': "📋 KARTU LAPORAN ANTROPOMETRI & EVALUASI BALITA DARING",
         'report_sub1': "1. Data Profil Balita & Orang Tua",
         'report_sub2': "2. Evaluasi Medis (WHO HAZ & AI)",
         'report_sub3': "3. Rencana Tindakan Lanjutan (Action Plan)",
         'report_note': "Catatan: Laporan ini dikirimkan otomatis ke email orang tua dan dapat dibawa saat berkonsultasi ke Posyandu/Puskesmas.",
         'xai_features': ['Usia (Bulan)', 'Jenis Kelamin', 'Tinggi Badan', 'Berat Badan', 'Berat Lahir', 'ASI Eksklusif'],
-        'xai_expl': "Penjelasan AI Transparency: Model kami menggunakan Random Forest Classifier yang dilatih pada indikator antropometri standar WHO. Grafik di atas menunjukkan bobot kontribusi setiap variabel input terhadap keputusan prediksi."
+        'xai_expl': "Penjelasan AI Transparency: Model kami menggunakan Random Forest Classifier yang dilatih pada indikator antropometri standar WHO."
     },
     'EN': {
         'title': "👶 NutriPredict-AI Pro",
-        'subtitle': "Early Detection, Growth Simulation & AI-Powered Stunting Prevention System",
+        'subtitle': "Early Detection, Growth Simulation & AI Consultation Hub",
         'login_header': "🔐 Online Monitoring Session Login",
         'login_sub': "Enter your child's name and parent email to save medical logs and generate printable online report cards:",
         'child_label': "Child's Full Name",
@@ -102,6 +96,7 @@ LANG = {
         'tab2': "📈 WHO Curves & Simulator",
         'tab3': "🥣 7-Day MPASI Recipes",
         'tab4': "📚 Education & Stunting News",
+        'tab5': "💬 AI Chat Consultation",
         'form_title': "📝 Child Anthropometry Form",
         'age_label': "Child Age (Months)",
         'gender_label': "Gender",
@@ -124,19 +119,18 @@ LANG = {
         'chart_analysis_title': "📋 Growth Trend Analysis Summary",
         'recipe_title': "🥣 7-Day High-Animal-Protein MPASI Guide & Cooking Tutorials",
         'edu_title': "📚 Educational Hub & Latest Indonesia Stunting News",
+        'chat_title': "🤖 NutriBot-AI: Growth & Child Nutrition Consultation",
         'report_card_title': "📋 ONLINE CHILD ANTHROPOMETRY & EVALUATION REPORT CARD",
         'report_sub1': "1. Child & Parent Profile Data",
         'report_sub2': "2. Medical Evaluation (WHO HAZ & AI)",
         'report_sub3': "3. Follow-up Action Plan",
         'report_note': "Note: This report is automatically logged for your email and can be brought to local health clinics.",
         'xai_features': ['Age (Months)', 'Gender', 'Height', 'Weight', 'Birth Weight', 'Exclusive Breastfeeding'],
-        'xai_expl': "AI Transparency Explanation: Our model utilizes a Random Forest Classifier trained on WHO anthropometric data. The chart above illustrates the importance weight of each variable in arriving at the stunting risk prediction."
+        'xai_expl': "AI Transparency Explanation: Our model utilizes a Random Forest Classifier trained on WHO anthropometric data."
     }
 }
 
-# ---------------------------------------------------------
-# 4. SIDEBAR LOGOUT & LANGUAGE SWITCHER
-# ---------------------------------------------------------
+# Sidebar Settings & Logout
 st.sidebar.title("⚙️ Pengaturan / Settings")
 lang_choice = st.sidebar.radio("🌐 Language / Bahasa:", ["Bahasa Indonesia", "English"])
 curr_lang = 'ID' if lang_choice == "Bahasa Indonesia" else 'EN'
@@ -144,14 +138,15 @@ txt = LANG[curr_lang]
 
 if st.session_state.logged_in:
     st.sidebar.markdown("---")
-    st.sidebar.write(f"👤 **{st.session_state.child_name}**")
+    st.sidebar.write(f"👤 Balita: **{st.session_state.child_name}**")
     st.sidebar.caption(f"📧 {st.session_state.parent_email}")
     if st.sidebar.button(txt['btn_logout']):
         st.session_state.logged_in = False
+        st.session_state.chat_messages = []
         st.rerun()
 
 # ---------------------------------------------------------
-# 5. STYLING CSS ANIMATIF & GLASSMORPHISM
+# 4. STYLING CSS ANIMATIF & GLASSMORPHISM
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -247,7 +242,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# 6. MODEL ML & ENGINE WHO Z-SCORE
+# 5. MODEL ML & ENGINE WHO Z-SCORE
 # ---------------------------------------------------------
 @st.cache_resource
 def load_model():
@@ -292,8 +287,24 @@ def calculate_who_zscore(age, height):
         
     return round(z_score, 2), status, color, round(base_median, 1)
 
+# Response Engine Sederhana untuk NutriBot-AI Chatbot
+def generate_bot_response(user_text, child_name, age, height, weight):
+    text = user_text.lower()
+    
+    if "susah makan" in text or "gtm" in text or "picky" in text or "makan" in text:
+        return f"Bunda/Ayah, untuk ananda **{child_name}** yang sedang mengalami Gerakan Tutup Mulut (GTM) atau susah makan, berikut beberapa langkah praktis:\n\n1. **Variasi Protein Hewani:** Cobalah mengolah lauk dengan bentuk menarik (misal: bakso ayam udang atau telur dadar daun kelor).\n2. **Atur Jadwal Makan:** Batasi durasi makan maksimal 30 menit dan hindari pemberian camilan mendekati jam makan utama.\n3. **Cek Tekstur MPASI:** Pastikan tekstur makanan sesuai dengan kelompok usianya ({age} bulan).\n\n*Jika anak menolak nasi, sumber karbohidrat bisa diganti dengan kentang, ubi, atau jagung pipil.*"
+    
+    elif "tinggi" in text or "pendek" in text or "stunting" in text:
+        return f"Berdasarkan data pencatatan, **{child_name}** berusia **{age} bulan** dengan tinggi **{height} cm**.\n\nUntuk mengoptimalkan pertumbuhan tinggi badan (panjang tulang):\n- Pastikan asupan **Protein Hewani (seperti telur, hati ayam, dan ikan kembung)** terpenuhi minimal 2 porsi/hari.\n- Protein hewani mengandung rangsangan faktor pertumbuhan *IGF-1* yang secara langsung memperpanjang tulang balita.\n- Pastikan waktu tidur anak cukup (11-14 jam per hari untuk balita) karena hormon pertumbuhan (*Growth Hormone*) diproduksi maksimal saat tidur nyenyak."
+    
+    elif "berat" in text or "kurus" in text or "bb" in text:
+        return f"Untuk menaikkan berat badan **{child_name}** ({weight} kg) secara sehat:\n\n- Tambahkan lemak tambahan (lemak sehat) seperti **santan segar, butter/margarin, minyak kelapa, atau minyak wijen** ke dalam MPASI/makanan utamanya.\n- Berikan porsi kecil tapi sering jika anak cepat kenyang.\n- Rutin cek ke Posyandu/Puskesmas untuk memantau grafik kenaikan berat badan harian (*weight faltering*)."
+    
+    else:
+        return f"Halo Bunda/Ayah dari **{child_name}**! Saya NutriBot-AI 🤖. Ada yang bisa saya bantu terkait tumbuh kembang, pola gizi MPASI, atau masalah susah makan anak Anda?"
+
 # ---------------------------------------------------------
-# 7. GATEWAY HALAMAN LOGIN (JIKA BELUM LOGIN)
+# 6. GATEWAY LOGIN (JIKA BELUM LOGIN)
 # ---------------------------------------------------------
 if not st.session_state.logged_in:
     st.markdown(f"""
@@ -327,9 +338,8 @@ if not st.session_state.logged_in:
     st.stop()
 
 # ---------------------------------------------------------
-# 8. DASHBOARD UTAMA (SETELAH LOGIN)
+# 7. DASHBOARD UTAMA (SETELAH LOGIN)
 # ---------------------------------------------------------
-# Header Dashboard
 st.markdown(f"""
 <div class="main-header">
     <h1>{txt['title']}</h1>
@@ -337,7 +347,8 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-tab1, tab2, tab3, tab4 = st.tabs([txt['tab1'], txt['tab2'], txt['tab3'], txt['tab4']])
+# 5 TAB LENGKAP TERMASUK TAB CHATBOT
+tab1, tab2, tab3, tab4, tab5 = st.tabs([txt['tab1'], txt['tab2'], txt['tab3'], txt['tab4'], txt['tab5']])
 
 # ================= TAB 1: PREDIKSI & Z-SCORE =================
 with tab1:
@@ -402,7 +413,6 @@ with tab1:
             fig_gauge.update_layout(height=220, paper_bgcolor="rgba(0,0,0,0)", font={'color': "white"})
             st.plotly_chart(fig_gauge, use_container_width=True)
 
-        # KARTU LAPORAN DARING LENGKAP NAMA & EMAIL
         report_html = f"""
         <div class="report-box" id="printable-report">
             <h2 style="color: #0284C7; text-align: center; margin-top:0;">{txt['report_card_title']}</h2>
@@ -436,7 +446,6 @@ with tab1:
         st.markdown(report_html, unsafe_allow_html=True)
         st.button(txt['print_btn'], on_click=lambda: st.components.v1.html("<script>window.print();</script>"))
 
-        # AI TRANSPARENCY (EXPLAINABLE AI WITH DETAILED EXPLANATION)
         st.write("---")
         st.markdown(f"### {txt['xai_title']}")
         importances = model.feature_importances_
@@ -485,7 +494,6 @@ with tab2:
     fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font=dict(color="white"), height=420)
     st.plotly_chart(fig, use_container_width=True)
 
-    # PENJELASAN RINGKASAN TREN
     st.markdown(f"#### {txt['chart_analysis_title']}")
     z_sc, st_name, _, med_val = calculate_who_zscore(curr_a, curr_h)
     diff = round(curr_h - med_val, 1)
@@ -502,7 +510,6 @@ with tab2:
     </div>
     """, unsafe_allow_html=True)
 
-    # SIMULATOR TARGET PERTUMBUHAN
     st.write("---")
     st.markdown(f"### {txt['sim_title']}")
     sim_months = st.slider(txt['sim_months'], min_value=1, max_value=12, value=6)
@@ -592,3 +599,34 @@ with tab4:
             <a class="ref-btn" href="https://www.who.int/news-room/fact-sheets/detail/malnutrition" target="_blank">🌐 WHO Fact Sheets: Child Malnutrition</a>
         </div>
         """, unsafe_allow_html=True)
+
+# ================= TAB 5: AI CHAT KONSULTASI =================
+with tab5:
+    st.markdown(f"### {txt['chat_title']}")
+    st.caption(f"Konsultasi interaktif seputar kondisi kesehatan, gizi MPASI, dan tumbuh kembang **Ananda {st.session_state.child_name}**:")
+
+    # Tampilkan Riwayat Chat
+    for message in st.session_state.chat_messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    # Input Chat Pengguna
+    if prompt := st.chat_input("Tanyakan sesuatu (misal: 'Anak saya susah makan nasi, solusinya apa?')..."):
+        # Tambah pesan user ke riwayat
+        st.session_state.chat_messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        # Hasilkan jawaban dari AI
+        bot_reply = generate_bot_response(
+            prompt, 
+            st.session_state.child_name, 
+            st.session_state.age_val, 
+            st.session_state.height_val, 
+            st.session_state.weight_val
+        )
+
+        # Tambah jawaban bot ke riwayat
+        st.session_state.chat_messages.append({"role": "assistant", "content": bot_reply})
+        with st.chat_message("assistant"):
+            st.markdown(bot_reply)
