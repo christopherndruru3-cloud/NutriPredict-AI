@@ -4,4 +4,4 @@ pandas
 plotly
 scikit-learn
 requests
-streamlit-lottie
+reportlab
