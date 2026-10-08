@@ -346,7 +346,6 @@ def generate_dynamic_action_plan(age_cat, age, height, weight, z_score, who_stat
 def generate_smart_ai_response(prompt, user_name, age_cat, age, height, weight):
     p = prompt.lower()
     
-    # 1. Stunting, Tengkes & Gagal Tumbuh
     if any(k in p for k in ["stunting", "tengkes", "pendek", "gagal tumbuh"]):
         if any(k in p for k in ["apa", "definisi", "pengertian", "artinya"]):
             return f"Halo **{user_name}**! Stunting adalah kondisi gagal tumbuh pada anak akibat kekurangan gizi kronis dan infeksi berulang dalam 1.000 Hari Pertama Kehidupan (0-24 bulan), menyebabkan anak lebih pendek dari standar usianya serta berisiko menurunkan perkembangan kognitif."
@@ -357,33 +356,27 @@ def generate_smart_ai_response(prompt, user_name, age_cat, age, height, weight):
         else:
             return f"Stunting merupakan masalah kesehatan nasional yang dapat dicegah dan ditangani dengan intervensi gizi spesifik (protein hewani) dan sanitasi lingkungan yang bersih untuk **{user_name}**."
 
-    # 2. Selera Makanan, Alergi & Alternatif Protein (Ayam, Ikan, Daging, dll)
     elif any(k in p for k in ["gasuka ayam", "tidak suka ayam", "gak suka ayam", "bosen ayam", "nggak suka ayam", "alergi ayam"]):
         return f"Jangan khawatir jika **{user_name}** tidak suka ayam! Alternatif sumber protein hewani setara yang kaya asam amino esensial meliputi:\n1. **Ikan (Kembung, Lele, atau Salmon):** Kaya Omega-3 untuk perkembangan otak.\n2. **Daging Sapi / Hati Sapi:** Tinggi zat besi untuk mencegah anemia.\n3. **Telur Ayam / Telur Puyuh:** Protein hewani paling praktis dan mudah diserap tubuh."
         
     elif any(k in p for k in ["gasuka ikan", "tidak suka ikan", "gak suka ikan", "nggak suka ikan", "bau amis", "amis"]):
         return f"Jika **{user_name}** kurang suka ikan karena bau amis, coba olahan alternatif berikut:\n1. **Daging sapi cincang** yang diolah menjadi bakso homemade.\n2. **Telur puyuh rebus atau dadar keju**.\n3. **Keju, yogurt, atau susu** sebagai sumber kalsium & protein pendukung."
 
-    # 3. Nafsu Makan, GTM & Lapar
     elif any(k in p for k in ["nafsu makan", "males makan", "ga nafsu", "gak nafsu", "susah makan", "gtm", "gerak tutup mulut"]):
         return f"Mengatasi penurunan nafsu makan atau GTM pada **{user_name}** ({age_cat}):\n1. **Porsi Kecil tapi Sering:** Bagi makan menjadi 5-6 kali sehari dengan porsi pas.\n2. **Booster Kalori Sehat:** Tambahkan butter/mentega, santan, atau keju leleh ke dalam makanan untuk meningkatkan aroma dan kalori.\n3. **Aturan Makan (Feeding Rules):** Batasi waktu makan maksimal 30 menit dan hindari paksaan."
         
     elif any(k in p for k in ["lapar", "mau makan", "pengen makan", "cari makan", "makan apa"]):
         return f"Saat **{user_name}** merasa lapar, pilih makanan padat gizi yang mengenyangkan:\n1. Karbohidrat kompleks (nasi merah/putih, kentang rebus).\n2. Protein pendamping (telur rebus, sup daging).\n3. Buah segar dan cukupi air putih."
 
-    # 4. Pantangan Medis (Teh, Kopi, Kafein)
     elif any(k in p for k in ["teh", "kopi", "kafein", "tanin"]):
         return f"⚠️ **PERHATIAN MEDIS:** Memberikan teh atau kopi pada balita/anak sangat tidak disarankan! Kandungan *tanin* di dalamnya mengikat zat besi (Fe) dan kalsium dari makanan hingga 70%, yang memicu Anemia Defisiensi Besi dan memperparah risiko stunting pada **{user_name}**."
 
-    # 5. Tinggi Badan, Pertumbuhan & Hormon
     elif any(k in p for k in ["tinggi", "pendek", "tumbuh", "tambah tinggi", "hormon"]):
         return f"Untuk mengoptimalkan tinggi badan **{user_name}** ({height} cm):\n1. Pastikan asupan **Protein Hewani** tercukupi setiap hari guna memicu hormon *IGF-1* pembentuk tulang.\n2. Tidur nyenyak malam hari (jam 22.00 - 02.00) karena *Growth Hormone* diproduksi maksimal saat *deep sleep*.\n3. Lakukan aktivitas fisik atau olahraga peregangan secara rutin."
 
-    # 6. Berat Badan, Diet, Kurus & Obesitas
     elif any(k in p for k in ["berat", "bb", "kurus", "gemuk", "diet", "turun berat", "naik berat"]):
-        return f"Pengaturan berat badan untuk **{user_name}** ({weight} kg) harus berpatokan pada IMT:\n- **Untuk Naik BB:** Tambahkan booster lemak sehat (santan, alpukat, keju, mentega) dan protein tinggi.\n- **Untuk Turun BB:** Batasi gula, gorengan, makanan instan, serta perbanyak serat dan aktivitas fisik."
+        return f"Pengaturan berat badan untuk **{user_name}** ({weight} kg) harus berpatokan pada IMT:\n- **Untuk Naik BB:** Tambahkan booster lemak sehat (santan, alpukat, keju, mentega) dan protein tinggi.\n- **For Turun BB:** Batasi gula, gorengan, makanan instan, serta perbanyak serat dan aktivitas fisik."
 
-    # 7. Penyakit Pendukung Stunting (Diare, Cacingan, ISPA, Anemia)
     elif any(k in p for k in ["diare", "mencret", "pencernaan", "perut"]):
         return f"Infeksi pencernaan berulang seperti diare dapat menyebabkan anak kehilangan nutrisi drastis (*malabsorpsi*). Berikan cairan rehidrasi (Oralit), zinc sesuai dosis dokter, serta tetap lanjutkan makanan lunak padat gizi untuk **{user_name}**."
         
@@ -393,11 +386,9 @@ def generate_smart_ai_response(prompt, user_name, age_cat, age, height, weight):
     elif any(k in p for k in ["anemia", "kurang darah", "pucat", "lesu", "lemas"]):
         return f"Anemia (kekurangan sel darah merah/zat besi) membuat anak lemas dan kurang fokus. Atasi dengan memberikan makanan kaya zat besi hewani (hati ayam, daging sapi, ikan) dan hindari teh/kopi saat makan."
 
-    # 8. Panduan Menu & Resep
     elif any(k in p for k in ["resep", "menu", "masak", "makanan apa", "mpasi"]):
         return f"Panduan menu nutrisi 7 hari terlengkap untuk kelompok usia **{age_cat}** sudah disediakan secara lengkap di **Tab 🥣 Resep Nutrisi 7 Hari**, lengkap dengan bahan, cara memasak, dan link tutorial videonya!"
 
-    # 9. Default Cerdas Kontekstual Lintas Pertanyaan Prediktif (Menampung Ratusan Variasi Lain)
     else:
         return f"Terima kasih atas pertanyaannya mengenai **{user_name}** ({age_cat})! Berdasarkan standar gizi dan kesehatan medis: Pastikan kecukupan gizi seimbang kaya Protein Hewani, penuhi hidrasi air putih, hindari jajanan tinggi gula/garam, serta pantau secara teratur grafik antropometri di aplikasi ini. Ada hal spesifik lain tentang menu, tinggi badan, atau keluhan kesehatan yang ingin didiskusikan?"
 
@@ -688,28 +679,91 @@ with tab2:
     sc2.metric("Proyeksi Tinggi Badan", f"{projected_height:.1f} cm", delta=f"+{sim_months * 0.75:.1f} cm")
     sc3.metric("Proyeksi Berat Badan", f"{projected_weight:.1f} kg", delta=f"+{sim_months * 0.25:.1f} kg")
 
-# ================= TAB 3: RESEP NUTRISI 7 HARI =================
+# ================= TAB 3: RESEP NUTRISI 7 HARI (LENGKAP SEMUA UMUR) =================
 with tab3:
     st.markdown(f"### {txt['recipe_title']}")
-    st.caption("Menu lengkap kaya Protein Hewani untuk mencegah dan mengatasi stunting, lengkap dengan cara memasak serta video tutorial resmi.")
+    st.caption("Pilih kelompok usia untuk melihat panduan menu nutrisi 7 hari lengkap dengan bahan, cara memasak, dan link tutorial video.")
     
-    recipes = [
-        {"day": "Hari 1", "title": "Bubur Tim Ikan Kembung & Labu Kuning", "protein": "Ikan Kembung (Tinggi Omega-3 & Protein setara Salmon)", "cal": "320 kkal", "steps": "1. Kukus fillet ikan kembung dan labu kuning hingga empuk.\n2. Blender atau saring kasar bersama nasi tim matang.\n3. Tambahkan 1 sdt mentega tawar (unsalted butter) sebelum disajikan.", "link": "https://www.youtube.com/results?search_query=resep+mpasi+ikan+kembung+anti+stunting"},
-        {"day": "Hari 2", "title": "Nasi Tim Hati Ayam Kampung & Bayam", "protein": "Hati Ayam (Kaya Zat Besi penangkal anemia)", "cal": "340 kkal", "steps": "1. Cincang halus hati ayam dan rebus sebentar dengan jahe untuk menghilangkan amis.\n2. Masak bersama beras merah/putih menjadi bubur lembik.\n3. Masukkan cincangan daun bayam di akhir memasak.", "link": "https://www.youtube.com/results?search_query=resep+mpasi+hati+ayam+anti+stunting"},
-        {"day": "Hari 3", "title": "Sup Telur Puyuh & Tahu Sutra", "protein": "Telur Puyuh (Sumber protein padat nutrisi & kolin)", "cal": "290 kkal", "steps": "1. Rebus telur puyuh lalu kupas.\n2. Tumis bawang putih cincang dengan sedikit minyak, masukkan kaldu ayam alami.\n3. Masukkan tahu sutra dan telur puyuh, didihkan, lalu beri taburan daun bawang.", "link": "https://www.youtube.com/results?search_query=resep+sup+telur+puyuh+tahu"},
-        {"day": "Hari 4", "title": "Bubur Ayam Kampung Kuah Kuning", "protein": "Ayam Kampung & Kunyit (Antioksidan & Protein Tinggi)", "cal": "310 kkal", "steps": "1. Rebus daging ayam kampung dengan bumbu halus kunyit, jahe, dan bawang.\n2. Suwir-suwir daging ayam dan campurkan ke dalam bubur kaldu gurih.", "link": "https://www.youtube.com/results?search_query=resep+bubur+ayam+kampung+nutrisi"},
-        {"day": "Hari 5", "title": "Nasi Tim Daging Cincang & Wortel", "protein": "Daging Sapi Giling (Zat Besi & Zinc optimal)", "cal": "350 kkal", "steps": "1. Tumis daging sapi giling dengan bawang bombay.\n2. Masukkan parutan wortel dan kaldu sapi asli.\n3. Masak bersama beras hingga menjadi nasi tim yang lembut.", "link": "https://www.youtube.com/results?search_query=resep+nasi+tim+daging+sapi+anak"},
-        {"day": "Hari 6", "title": "Puree Kentang & Ikan Lele Kukus", "protein": "Ikan Lele (Protein hewani lokal murah & kaya gizi)", "cal": "300 kkal", "steps": "1. Kukus kentang dan ikan lele hingga matang.\n2. Haluskan kentang dengan susu/santan encer, lalu suwir daging lele tanpa duri di atasnya.", "link": "https://www.youtube.com/results?search_query=resep+ikan+lele+untuk+mpasi+anak"},
-        {"day": "Hari 7", "title": "Nasi Tim Telur Dadar Cincang & Kuah Kaldu", "protein": "Telur Ayam (Protein hewani terlengkap asam aminunya)", "cal": "330 kkal", "steps": "1. Buat dadar telur tipis dengan sedikit mentega.\n2. Cincang halus dadar telur dan campurkan ke dalam nasi tim hangat bersama kaldu.", "link": "https://www.youtube.com/results?search_query=resep+olahan+telur+untuk+anak"}
-    ]
+    cat_recipe = st.radio("Pilih Kelompok Usia Resep / Select Recipe Category:", 
+                          ["Balita (6-8 Bulan)", "Balita (9-11 Bulan)", "Balita (12-23 Bulan)", "Anak-Anak (5-12 Tahun)", "Remaja (13-18 Tahun)", "Dewasa (19-59 Tahun)", "Lansia (60+ Tahun)"], horizontal=True)
     
-    for r in recipes:
-        with st.expander(f"🍽️ {r['day']}: {r['title']} ({r['cal']})"):
-            st.markdown(f"**Sumber Protein Utama:** {r['protein']}")
-            st.markdown(f"**Cara Memasak / Resep:**\n{r['steps']}")
-            st.markdown(f'<a href="{r["link"]}" target="_blank" class="ref-btn">▶️ Tonton Tutorial YouTube</a>', unsafe_allow_html=True)
+    if "6-8" in cat_recipe:
+        recipes = [
+            ("Senin", "🐣 Puree Hati Ayam & Santan", "Bahan: 30g Hati Ayam, 2 sdm Nasi, 1 sdt Santan, Wortel.\n\nTutorial:\n1. Rebus hati ayam & wortel hingga matang empuk.\n2. Lumatkan nasi hangat bersama parutan wortel.\n3. Tambahkan 1 sdt santan segar hangat lalu saring halus dengan saringan kawat.", "https://www.youtube.com/results?search_query=resep+mpasi+hati+ayam+santan"),
+            ("Selasa", "🐟 Puree Ikan Kembung & Labu Siam", "Bahan: 30g Fillet Ikan Kembung, 2 sdm Nasi, Labu Siam, 1 sdt Minyak Kelapa.\n\nTutorial:\n1. Kukus fillet ikan kembung tanpa duri dan parutan labu siam.\n2. Campurkan dengan nasi tim hangat.\n3. Tambahkan 1 sdt minyak kelapa lalu saring lumat.", "https://www.youtube.com/results?search_query=resep+mpasi+ikan+kembung"),
+            ("Rabu", "🥚 Puree Telur Puyuh & Bayam", "Bahan: 2 Butir Telur Puyuh, 2 sdm Nasi, Daun Bayam, Sejumput Butter.\n\nTutorial:\n1. Rebus telur puyuh hingga matang keras lalu lumatkan kuning & putihnya.\n2. Cincang halus daun bayam rebus.\n3. Aduk rata bersama nasi lembik dan butter.", "https://www.youtube.com/results?search_query=resep+mpasi+telur+puyuh+bayam"),
+            ("Kamis", "🥩 Puree Daging Sapi & Kentang", "Bahan: 30g Daging Sapi Cincang, 1/2 Kentang Rebus, Keju Parut.\n\nTutorial:\n1. Tumis daging sapi cincang halus hingga matang.\n2. Rebus kentang lalu lumatkan bersama daging sapi.\n3. Taburi keju parut secukupnya.", "https://www.youtube.com/results?search_query=resep+mpasi+daging+sapi+kentang"),
+            ("Jumat", "🦐 Puree Udang & Tahu Lembut", "Bahan: 30g Udang Cincang, 1/2 Tahu Putih, 2 sdm Nasi, Minyak Wijen.\n\nTutorial:\n1. Cincang halus udang kupas bersih.\n2. Lumatkan tahu putih bersama nasi lembik.\n3. Kukus selama 15 menit dan beri 2 tetes minyak wijen.", "https://www.youtube.com/results?search_query=resep+mpasi+udang+tahu"),
+            ("Sabtu", "🍳 Puree Telur Bebek & Tempe", "Bahan: 1/2 Telur Bebek, 1 Potong Tempe, 2 sdm Nasi, Margarin.\n\nTutorial:\n1. Kukus tempe hingga empuk.\n2. Orak-arik telur bebek dengan margarin.\n3. Lumatkan halus tempe, telur, dan nasi hangat.", "https://www.youtube.com/results?search_query=resep+mpasi+telur+bebek+tempe"),
+            ("Minggu", "🍲 Puree Ayam & Kaldu Ceker", "Bahan: 30g Daging Ayam Cincang, Wortel, Kuah Kaldu Ceker, Nasi.\n\nTutorial:\n1. Rebus daging ayam dan wortel dalam kuah kaldu ceker alami.\n2. Lumatkan nasi hangat bersama rebusan ayam hingga tekstur puree lembut.", "https://www.youtube.com/results?search_query=resep+mpasi+ayam+kaldu+ceker")
+        ]
+    elif "9-11" in cat_recipe:
+        recipes = [
+            ("Senin", "🌾 Tim Nasi Hati Ayam Cincang", "Bahan: 40g Hati Ayam, 3 sdm Nasi Tim, Buncis Cincang, Margarin.\n\nTutorial:\n1. Tumis hati ayam cincang dengan margarin.\n2. Masukkan nasi tim & potongan buncis halus.\n3. Masak hingga bumbu meresap.", "https://www.youtube.com/results?search_query=resep+nasi+tim+hati+ayam"),
+            ("Selasa", "🐟 Tim Ikan Kembung Suwir & Kelor", "Bahan: 40g Ikan Kembung, Daun Kelor Cincang, Nasi Tim, Minyak Kelapa.\n\nTutorial:\n1. Suwir halus ikan kembung kukus tanpa duri.\n2. Masukkan ke nasi tim bersama daun kelor cincang halus.", "https://www.youtube.com/results?search_query=resep+nasi+tim+ikan+kembung"),
+            ("Rabu", "🥚 Tim Nasi Telur Bebek & Jagung", "Bahan: 1 Telur Bebek, Jagung Manis Pipil, Nasi Tim, Margarin.\n\nTutorial:\n1. Orak-arik telur bebek dengan margarin.\n2. Campurkan dengan nasi tim & pipilan jagung manis lumat.", "https://www.youtube.com/results?search_query=resep+nasi+tim+telur+jagung"),
+            ("Kamis", "🥩 Tim Daging Sapi Cincang & Brokoli", "Bahan: 40g Daging Sapi Cincang, Brokoli Cincang, Nasi Tim, Bawang Putih.\n\nTutorial:\n1. Tumis daging sapi cincang & bawang putih harum.\n2. Masukkan nasi tim & cincangan brokoli hingga matang.", "https://www.youtube.com/results?search_query=resep+nasi+tim+daging+brokoli"),
+            ("Jumat", "🦐 Tim Udang Cincang & Tahu Dadu", "Bahan: 40g Udang Cincang, Tahu Dadu Kecil, Nasi Tim, Minyak Wijen.\n\nTutorial:\n1. Tumis udang cincang dengan sedikit minyak wijen.\n2. Masukkan tahu dadu kecil & nasi tim hangat.", "https://www.youtube.com/results?search_query=resep+nasi+tim+udang+tahu"),
+            ("Sabtu", "🍳 Tim Telur Puyuh & Sup Wortel", "Bahan: 3 Butir Telur Puyuh, Wortel Dadu, Nasi Tim, Kuah Ayam.\n\nTutorial:\n1. Rebus 3 telur puyuh.\n2. Sajikan bersama nasi tim & sup wortel potong dadu kecil.", "https://www.youtube.com/results?search_query=resep+nasi+tim+telur+puyuh"),
+            ("Minggu", "🍲 Tim Bola-Bola Ayam & Labu", "Bahan: 40g Ayam Cincang, Labu Siam Dadu, Nasi Tim, Kaldu.\n\nTutorial:\n1. Buat adonan bola ayam cincang kecil.\n2. Rebus dalam kuah kaldu bersama labu siam hingga matang.", "https://www.youtube.com/results?search_query=resep+nasi+tim+bola+ayam")
+        ]
+    elif "12-23" in cat_recipe:
+        recipes = [
+            ("Senin", "🍲 Sup Bola Bakso Ayam Udang", "Bahan: 50g Daging Ayam & Udang, Wortel, Kentang, Kuah Kaldu.\n\nTutorial:\n1. Buat bakso ayam udang homemade.\n2. Rebus dalam kuah kaldu wortel & kentang hingga mengapung matang.", "https://www.youtube.com/results?search_query=resep+sup+bakso+ayam+udang+anak"),
+            ("Selasa", "🐟 Pepes Ikan Lele / Belut Tanpa Duri", "Bahan: 50g Lele/Belut, Bumbu Kuning Lembut, Daun Pisang.\n\nTutorial:\n1. Bumbui lele/belut tanpa duri dengan bumbu harum.\n2. Kukus dalam bungkus daun pisang selama 20 menit.", "https://www.youtube.com/results?search_query=resep+pepes+lele+tanpa+duri+anak"),
+            ("Rabu", "🥩 Semur Daging Cincang & Telur Puyuh", "Bahan: 50g Daging Sapi Cincang, 3 Telur Puyuh, Kecap Manis, Bawang.\n\nTutorial:\n1. Tumis daging sapi cincang kecap manis harum.\n2. Masukkan 3 butir telur puyuh rebus hingga bumbu meresap.", "https://www.youtube.com/results?search_query=resep+semur+daging+cincang+balita"),
+            ("Kamis", "🍗 Ayam Goreng Kaldu & Sayur Bening", "Bahan: 1 Potong Ayam Ungkep Kaldu, Bayam, Nasi Warm.\n\nTutorial:\n1. Ungkep ayam dengan kaldu alami lalu goreng sebentar.\n2. Sajikan dengan sayur bening bayam & nasi hangat.", "https://www.youtube.com/results?search_query=resep+ayam+goreng+kaldu+sayur+bayam"),
+            ("Jumat", "🦐 Tumis Udang Brokoli Saus Mentega", "Bahan: 50g Udang Kupas, Brokoli, Mentega, Kecap Manis.\n\nTutorial:\n1. Tumis udang kupas & brokoli dengan mentega harum.\n2. Beri sedikit kecap manis.", "https://www.youtube.com/results?search_query=resep+udang+brokoli+mentega+anak"),
+            ("Sabtu", "🍳 Telur Dadar Daun Kelor & Nasi Warm", "Bahan: 1 Butir Telur Ayam, Daun Kelor Cincang, Margarin.\n\nTutorial:\n1. Kocok 1 butir telur dengan daun kelor cincang.\n2. Dadar tipis dengan margarin dan sajikan bersama nasi hangat.", "https://www.youtube.com/results?search_query=resep+telur+dadar+daun+kelor"),
+            ("Minggu", "🥞 Pancake Hati Ayam & Pisang", "Bahan: Tepung Terigu, Pisang Lumat, 1 Telur, Bubuk Hati Ayam Sangrai.\n\nTutorial:\n1. Campurkan tepung terigu, pisang lumat, telur, & bubuk hati ayam sangrai.\n2. Panggang di teflon dengan api kecil hingga matang keemasan.", "https://www.youtube.com/results?search_query=resep+pancake+hati+ayam+pisang")
+        ]
+    elif "Anak-Anak" in cat_recipe:
+        recipes = [
+            ("Senin", "🍱 Bento Nasi Kuning Ayam Popcorn", "Bahan: Nasi Kuning, Dada Ayam Tepung, Telur Rebus, Wortel.\n\nTutorial:\n1. Goreng dada ayam tepung crispy.\n2. Cetak nasi kuning dan hias bersama potongan telur rebus.", "https://www.youtube.com/results?search_query=resep+bento+anak+sekolah+sehat"),
+            ("Selasa", "🍝 Spaghetti Salmon Bolognese", "Bahan: Pasta Spaghetti, Fillet Salmon Cincang, Saus Tomat Homemade.\n\nTutorial:\n1. Rebus spaghetti al dente.\n2. Tumis salmon cincang dengan saus tomat lalu siram di atas pasta.", "https://www.youtube.com/results?search_query=resep+spaghetti+salmon+anak"),
+            ("Rabu", "🍲 Sup Makaroni Daging Sapi & Buncis", "Bahan: Daging Sapi Cincang, Makaroni, Buncis, Wortel, Kaldu Sapi.\n\nTutorial:\n1. Rebus daging sapi dan makaroni hingga empuk.\n2. Masukkan sayuran buncis & wortel dalam kuah kaldu gizi.", "https://www.youtube.com/results?search_query=resep+sup+makaroni+daging+sapi"),
+            ("Kamis", "🍳 Nasi Goreng Telur Puyuh & Udang", "Bahan: Nasi Putih, 4 Telur Puyuh, Udang Kupas, Minyak Wijen.\n\nTutorial:\n1. Tumis udang kupas dan telur puyuh orak-arik.\n2. Masukkan nasi dan bumbui ringan tanpa pengawet.", "https://www.youtube.com/results?search_query=resep+nasi+goreng+sehat+anak"),
+            ("Jumat", "🍗 Chicken Teriyaki & Tumis Brokoli", "Bahan: Dada Ayam, Saus Teriyaki, Brokoli, Biji Wijen.\n\nTutorial:\n1. Tumis ayam potong dengan saus teriyaki gurih.\n2. Sajikan dengan rebusan brokoli segar & taburan biji wijen.", "https://www.youtube.com/results?search_query=resep+chicken+teriyaki+anak"),
+            ("Sabtu", "🥪 Sandwich Telur Keju & Daging Asap", "Bahan: Roti Tawar Gandum, Telur Dadar, Keju Slice, Daging Asap.\n\nTutorial:\n1. Panggang roti gandum di atas teflon.\n2. Susun telur dadar, keju, & daging asap hangat.", "https://www.youtube.com/results?search_query=resep+sandwich+sehat+anak"),
+            ("Minggu", "🍲 Soto Ayam Kuah Bening & Telur Rebus", "Bahan: Daging Ayam Suwir, Kuah Soto Bening, Telur Rebus, Tauge.\n\nTutorial:\n1. Rebus ayam kuah soto rempah alami.\n2. Sajikan suwiran ayam, tauge, & telur rebus matang.", "https://www.youtube.com/results?search_query=resep+soto+ayam+kuah+bening")
+        ]
+    elif "Remaja" in cat_recipe:
+        recipes = [
+            ("Senin", "🥩 Beef Bowl Yoshinoya Style & Egg", "Bahan: Daging Sapi Slice, Bawang Bombay, Kecap Asin, 1 Telur Ceplok.\n\nTutorial:\n1. Tumis daging sapi slice bersama bawang bombay saus gurih.\n2. Tumpuk di atas nasi hangat bersama telur ceplok setengah matang.", "https://www.youtube.com/results?search_query=resep+beef+bowl+ala+yoshinoya"),
+            ("Selasa", "🥗 Salad Salmon Panggang & Avokad", "Bahan: Fillet Salmon, Alpukat Slice, Sayur Selada, Olive Oil.\n\nTutorial:\n1. Panggang salmon dengan garam & lada hitam.\n2. Campur selada segar, potongan alpukat, & dressing olive oil.", "https://www.youtube.com/results?search_query=resep+salad+salmon+alpukat"),
+            ("Rabu", "🍗 Ayam Bakar Madu & Tumis Kangkung", "Bahan: Paha Ayam, Bumbu Madu, Kangkung, Bawang Merah Putih.\n\nTutorial:\n1. Ungkep ayam bumbu madu lalu bakar keemasan.\n2. Tumis kangkung segar dengan sedikit minyak.", "https://www.youtube.com/results?search_query=resep+ayam+bakar+madu+teflon"),
+            ("Kamis", "🍲 Sup Ikan Batang Asam Pedas", "Bahan: Fillet Kakap/Tenggiri, Tomat Hijau, Belimbing Wulung.\n\nTutorial:\n1. Rebus kuah rempah bening asam segar.\n2. Masukkan fillet ikan & potongan tomat hingga matang.", "https://www.youtube.com/results?search_query=resep+sup+ikan+asam+pedas"),
+            ("Jumat", "🍝 Fusilli Tuna Spicy Olive Oil", "Bahan: Pasta Fusilli, Tuna Cincang, Cabai Rawit, Minyak Zaitun.\n\nTutorial:\n1. Tumis tuna cincang & irisan cabai dengan olive oil.\n2. Campurkan pasta fusilli rebus.", "https://www.youtube.com/results?search_query=resep+pasta+tuna+aglio+olio"),
+            ("Sabtu", "🍳 Omelet Daging Cincang & Bayam Keju", "Bahan: 2 Telur Ayam, Daging Sapi Cincang, Bayam, Keju Mozzarella.\n\nTutorial:\n1. Kocok telur dengan isi daging cincang & bayam.\n2. Lipat omelet dan beri lelehan keju mozzarella di atasnya.", "https://www.youtube.com/results?search_query=resep+omelet+keju+daging+cincang"),
+            ("Minggu", "🥣 Smoothies Bowl Buah Naga & Chia", "Bahan: Buah Naga Blend, Pisang, Chia Seeds, Kacang Almond.\n\nTutorial:\n1. Blender halus buah naga & pisang dingin.\n2. Tuang ke mangkok dan beri topping chia seeds & almond renyah.", "https://www.youtube.com/results?search_query=resep+smoothie+bowl+buah+naga")
+        ]
+    elif "Dewasa" in cat_recipe:
+        recipes = [
+            ("Senin", "🐟 Salmon Panggang Lemon & Kentang", "Bahan: Fillet Salmon, Perasan Lemon, Kentang, Rosemary.\n\nTutorial:\n1. Marinasi salmon dengan perasan lemon & lada.\n2. Panggang teflon 8 menit & sajikan dengan kentang rebus.", "https://www.youtube.com/results?search_query=resep+salmon+panggang+lemon"),
+            ("Selasa", "🥗 Pokebowl Tuna Segar & Edamame", "Bahan: Fillet Tuna, Kacang Edamame, Nasi Merah, Wijen.\n\nTutorial:\n1. Tumis tuna sebentar dengan minyak wijen.\n2. Susun di atas nasi merah bersama edamame rebus.", "https://www.youtube.com/results?search_query=resep+tuna+poke+bowl"),
+            ("Rabu", "🥩 Tumis Daging Sapi Lada Hitam", "Bahan: Daging Sapi Lean Slice, Paprika Merah Hijau, Lada Hitam.\n\nTutorial:\n1. Tumis daging sapi tanpa lemak bersama saus lada hitam.\n2. Masukkan potongan paprika kaya vitamin C.", "https://www.youtube.com/results?search_query=resep+daging+sapi+lada+hitam"),
+            ("Kamis", "🍗 Dada Ayam Panggang Herb", "Bahan: Dada Ayam Tanpa Kulit, Oregano, Buncis, Minyak Zaitun.\n\nTutorial:\n1. Panggang dada ayam bumbu herb rendah garam.\n2. Tumis buncis dengan minyak zaitun ringan.", "https://www.youtube.com/results?search_query=resep+dada+ayam+panggang+diet"),
+            ("Jumat", "🍲 Sup Ikan Gurame Bening Kemangi", "Bahan: Fillet Gurame, Daun Kemangi, Jahe, Serai, Kuah Bening.\n\nTutorial:\n1. Rebus kuah jahe serai wangi tanpa santan.\n2. Masukkan fillet gurame & daun kemangi hingga segar.", "https://www.youtube.com/results?search_query=resep+sup+ikan+gurame+kemangi"),
+            ("Sabtu", "🍳 Tofu Stir Fry Shimeji & Telur", "Bahan: Tofu Jepang, Jamur Shimeji, 1 Telur, Saus Tiram.\n\nTutorial:\n1. Tumis tofu & jamur shimeji saus tiram rendah natrium.\n2. Orak-arik telur sebagai peningkat protein.", "https://www.youtube.com/results?search_query=resep+tumis+tofu+jamur+shimeji"),
+            ("Minggu", "🥣 Oatmeal Kayu Manis & Telur Rebus", "Bahan: Rolled Oats, Bubuk Kayu Manis, Buah Apel, 2 Telur Rebus.\n\nTutorial:\n1. Seduh rolled oats hangat dan beri parutan apel & kayu manis.\n2. Sajikan dengan 2 butir telur rebus matang.", "https://www.youtube.com/results?search_query=resep+oatmeal+sehat+pagi+hari")
+        ]
+    else: # Lansia
+        recipes = [
+            ("Senin", "🐟 Tim Fillet Kakap Jahe Lengkuas", "Bahan: Fillet Kakap, Irisan Jahe, Daun Bawang, Minyak Wijen.\n\nTutorial:\n1. Kukus fillet kakap dengan irisan jahe & serai hingga lembut.\n2. Beri beberapa tetes minyak wijen wangi tanpa garam berlebih.", "https://www.youtube.com/results?search_query=resep+tim+ikan+kakap+jahe+lansia"),
+            ("Selasa", "🍲 Sup Tahu Sutra & Ayam Cincang", "Bahan: Tahu Sutra, Dada Ayam Cincang, Labu Siam, Kuah Bening.\n\nTutorial:\n1. Rebus kuah kaldu bening rendah garam.\n2. Masukkan tahu sutra lembut & ayam cincang empuk mudah dikunyah.", "https://www.youtube.com/results?search_query=resep+sup+tahu+sutra+ayam"),
+            ("Rabu", "🥚 Pepes Telur Tahu & Kemangi", "Bahan: 2 Telur Kocok, Tahu Lumat, Daun Kemangi, Bungkus Pisang.\n\nTutorial:\n1. Campur lumat tahu dan telur dengan kemangi harum.\n2. Kukus dalam daun pisang hingga matang empuk.", "https://www.youtube.com/results?search_query=resep+pepes+tahu+telur+lembut"),
+            ("Kamis", "🥩 Semur Daging Giling Empuk & Wortel", "Bahan: Daging Sapi Giling Halus, Wortel Rebus Empuk, Kecap.\n\nTutorial:\n1. Masak daging sapi giling lembut dengan bumbu semur ringan.\n2. Masukkan wortel rebus hingga tekstur sangat lembut.", "https://www.youtube.com/results?search_query=resep+semur+daging+giling+lansia"),
+            ("Jumat", "🥣 Bubur Manado Tinutuan Komplit", "Bahan: Beras, Labu Kuning Lumat, Bayam, Jagung Manis Pipil.\n\nTutorial:\n1. Masak bubur beras bersama labu kuning lumat kaya karotenoid.\n2. Masukkan sayuran lembut untuk kemudahan cerna lansia.", "https://www.youtube.com/results?search_query=resep+bubur+manado+sehat"),
+            ("Sabtu", "🍲 Sup Ayam Ceker & Sayuran Bening", "Bahan: Ceker Ayam Kaldu, Wortel, Kentang, Brokoli Rebus.\n\nTutorial:\n1. Rebus ceker ayam lama hingga keluar kolagen kaldu alami.\n2. Masukkan sayuran dipotong kecil empuk.", "https://www.youtube.com/results?search_query=resep+sup+ceker+ayam+kolagen"),
+            ("Minggu", "🍳 Scrambled Egg Tahu & Puree Labu", "Bahan: 2 Telur Bebek/Ayam, Tahu Sutra, Puree Labu Kuning.\n\nTutorial:\n1. Orak-arik lembut telur dan tahu sutra dengan butter.\n2. Sajikan bersama puree labu kuning hangat yang lezat.", "https://www.youtube.com/results?search_query=resep+telur+orak+arik+tahu+lembut")
+        ]
 
-# ================= TAB 4: EDUKASI & BERITA VIDEO =================
+    for day_name, title, tut, yt_link in recipes:
+        with st.expander(f"🍽️ {day_name}: {title}"):
+            st.markdown(f"**Bahan & Cara Memasak:**\n\n{tut}")
+            st.markdown(f'<a href="{yt_link}" target="_blank" class="ref-btn">▶️ Tonton Video Tutorial YouTube</a>', unsafe_allow_html=True)
+
+# ================= TAB 4: EDUKASI & BERITA VIDEO (LENGKAP DEFINISI, BAHAYA & LINK) =================
 with tab4:
     st.markdown(f"### {txt['edu_title']}")
     
@@ -717,27 +771,45 @@ with tab4:
     with col_e1:
         st.markdown("""
         <div class="edu-card">
-            <h3>📖 Apa itu Stunting dan Mengapa Cegah Sejak Dini?</h3>
-            <p>Stunting bukan sekadar masalah genetik atau keturunan pendek, melainkan manifestasi dari kekurangan gizi kronis dan infeksi berulang dalam 1.000 Hari Pertama Kehidupan (HPK).</p>
-            <a href="https://www.who.int/news-room/fact-sheets/detail/stunting-in-a-nutshell" target="_blank" class="ref-btn">🔗 Rujukan Resmi WHO</a>
-            <a href="https://www.kemkes.go.id" target="_blank" class="ref-btn">🔗 Kemenkes RI</a>
+            <h3>📖 1. Definisi & Bahaya Stunting</h3>
+            <p>Stunting adalah gangguan pertumbuhan kronis pada anak (tinggi badan di bawah standar usianya) akibat kekurangan gizi menahun dan infeksi berulang dalam 1.000 Hari Pertama Kehidupan (HPK). Bahayanya meliputi penurunan kecerdasan (IQ), gangguan metabolisme saat dewasa, serta rentan terhadap penyakit tidak menular.</p>
+            <a href="https://www.who.int/news-room/fact-sheets/detail/stunting-in-a-nutshell" target="_blank" class="ref-btn">🌐 Rujukan Resmi WHO Stunting</a>
+            <a href="https://ayosehat.kemkes.go.id/topik-penyakit/defisiensi-nutrisi/stunting" target="_blank" class="ref-btn">🌐 AyoSehat Kemenkes RI</a>
         </div>
         """, unsafe_allow_html=True)
         
         st.markdown("""
         <div class="edu-card">
-            <h3>🍳 Keunggulan Protein Hewani Dibanding Nabati</h3>
-            <p>Riset klinis membuktikan bahwa asam amino esensial lengkap pada protein hewani (seperti telur, ikan, susu, daging) jauh lebih efektif menstimulasi hormon pertumbuhan (*IGF-1*) dibandingkan protein nabati.</p>
-            <a href="https://www.unicef.org" target="_blank" class="ref-btn">🔗 UNICEF Child Nutrition</a>
+            <h3>🍳 2. Keunggulan Protein Hewani & Pencegahan</h3>
+            <p>Protein hewani (seperti ikan kembung, telur, hati ayam, daging) mengandung asam amino esensial lengkap dan zinc tinggi yang terbukti secara klinis jauh lebih efektif merangsang hormon pertumbuhan tulang (*IGF-1*) dibanding protein nabati.</p>
+            <a href="https://www.unicef.org/reports/child-nutrition-report" target="_blank" class="ref-btn">🌐 UNICEF Child Nutrition</a>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="edu-card">
+            <h3>📰 3. Berita & Isu Terkini Penanganan Stunting</h3>
+            <p>Pemerintah terus menggalakkan program intervensi serentak di posyandu seluruh Indonesia, menekankan pentingnya pemberian Makanan Tambahan (PMT) berbasis pangan lokal kaya protein hewani serta percepatan akses sanitasi layak.</p>
+            <a href="https://stunting.go.id" target="_blank" class="ref-btn">🌐 Portal Resmi TP2S BKKBN</a>
         </div>
         """, unsafe_allow_html=True)
 
     with col_e2:
         st.markdown("""
         <div class="edu-card">
-            <h3>🎥 Video Edukasi: Pencegahan Stunting Nasional</h3>
-            <p>Tonton video panduan resmi penanganan stunting dan pentingnya pemberian makanan bergizi seimbang di fasilitas kesehatan:</p>
-            <iframe width="100%" height="215" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Video Edukasi" frameborder="0" allowfullscreen style="border-radius:10px; margin-top:10px;"></iframe>
+            <h3>🎥 Video Edukasi: Pencegahan Stunting Nasional Kemenkes</h3>
+            <p>Tonton video panduan resmi mengenai gerakan pencegahan stunting melalui pilar ABCDE:</p>
+            <iframe width="100%" height="215" src="https://www.youtube.com/embed/2Z1h9mQX7EQ" title="Video Edukasi Kemenkes" frameborder="0" allowfullscreen style="border-radius:10px; margin-top:10px;"></iframe>
+            <a href="https://www.youtube.com/watch?v=2Z1h9mQX7EQ" target="_blank" class="ref-btn">▶️ Buka Langsung di YouTube</a>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="edu-card">
+            <h3>🎥 Video Edukasi BKKBN: 1000 Hari Pertama Kehidupan</h3>
+            <p>Panduan penting bagi orang tua dalam menjaga asupan gizi sejak dalam kandungan hingga usia 2 tahun:</p>
+            <iframe width="100%" height="215" src="https://www.youtube.com/embed/S00n-c_qeC0" title="Video Edukasi BKKBN" frameborder="0" allowfullscreen style="border-radius:10px; margin-top:10px;"></iframe>
+            <a href="https://www.youtube.com/watch?v=S00n-c_qeC0" target="_blank" class="ref-btn">▶️ Buka Langsung di YouTube</a>
         </div>
         """, unsafe_allow_html=True)
 
