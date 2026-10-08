@@ -811,20 +811,47 @@ with tab4:
         st.caption("Sumber: BKKBN RI Official")
 
 # ================= TAB 5: NUTRIPOT-AI CHAT KONSULTASI =================
-with tab5:
-    st.markdown(f"### {txt['chat_title']}")
-    st.caption(f"Ruang Diskusi & Konsultasi Interaktif Pakar Medis Gizi Balita & Lintas Usia ({st.session_state.age_category}):")
-
-    for msg in st.session_state.chat_messages:
-        with st.chat_message(msg["role"]):
-            st.write(msg["content"])
-
-    if prompt := st.chat_input("Ketik pertanyaan konsultasi di sini (misal: 'Anak saya ga suka makan ikan, alternatifnya apa?')..."):
-        st.session_state.chat_messages.append({"role": "user", "content": prompt})
+def generate_smart_ai_response(prompt, user_name, age_cat, age, height, weight):
+    p = prompt.lower()
+    
+    # 1. Kasus Tidak Suka / Alergi Makanan Tertentu (Ayam, Ikan, Daging, dll)
+    if any(k in p for k in ["gasuka ayam", "tidak suka ayam", "gak suka ayam", "bosen ayam", "nggak suka ayam", "alergi ayam"]):
+        return f"Halo **{user_name}**! Jangan khawatir jika tidak suka ayam. Sebagai alternatif sumber protein hewani yang setara dan kaya asam amino untuk kategori **{age_cat}**, kamu bisa menggantinya dengan:\n1. **Ikan (Kembung, Lele, atau Salmon):** Tinggi Omega-3 dan lemak sehat.\n2. **Daging Sapi / Kambing / Hati Sapi:** Sumber zat besi tinggi penangkal anemia.\n3. **Telur Ayam / Telur Puyuh / Telur Bebek:** Protein hewani paling praktis dan mudah diserap tubuh."
         
-        bot_reply = generate_smart_ai_response(
-            prompt, st.session_state.user_name, st.session_state.age_category, st.session_state.age_val, 
-            st.session_state.height_val, st.session_state.weight_val
-        )
-        st.session_state.chat_messages.append({"role": "assistant", "content": bot_reply})
-        st.rerun()
+    elif any(k in p for k in ["gasuka ikan", "tidak suka ikan", "gak suka ikan", "nggak suka ikan", "bau amis"]):
+        return f"Tidak masalah jika **{user_name}** kurang suka ikan karena bau amis. Kamu tetap bisa mendapatkan protein hewani dari:\n1. **Daging sapi cincang atau ayam** yang diolah menjadi bakso / nugget homemade.\n2. **Telur puyuh atau telur dadar keju**.\n3. **Keju, yogurt, atau susu** sebagai tambahan kalsium & protein harian."
+
+    # 2. Kasus Lapar / Ingin Makan Sesuatu
+    elif any(k in p for k in ["lapar", "mau makan", "pengen makan", "cari makan", "makan apa"]):
+        return f"Wah, kalau **{user_name}** sedang merasa lapar, pastikan memilih makanan yang padat gizi dan mengenyangkan tahan lama:\n1. **Karbohidrat Kompleks:** Nasi merah/putih, kentang rebus, atau roti gandum.\n2. **Protein Pendamping:** Telur rebus, dada ayam panggang, atau sup tahu hangat.\n3. **Camilan Sehat:** Buah segar (pisang/alpukat) atau segelas air putih hangat agar hidrasi tetap terjaga."
+
+    # 3. Kasus Nafsu Makan Kurang / Turun / GTM
+    elif any(k in p for k in ["nafsu makan", "males makan", "ga nafsu", "gak nafsu", "susah makan", "gtm"]):
+        return f"Menurunnya nafsu makan pada **{user_name}** ({age_cat}) bisa diatasi dengan:\n1. **Ubah Porsi Menjadi Kecil Tapi Sering:** Daripada langsung makan 1 porsi besar, bagi menjadi 5-6 kali makan porsi kecil.\n2. **Gunakan Booster Rasa & Kalori:** Tambahkan sedikit mentega (butter), kaldu alami, atau keju leleh pada makanan untuk meningkatkan aroma dan selera.\n3. **Cek Aktivitas Fisik:** Lakukan jalan santai atau olahraga ringan agar metabolisme tubuh terstimulasi dan rasa lapar muncul secara alami."
+
+    # 4. Kasus GTM / Anak Kecil / Balita
+    elif any(k in p for k in ["gtm", "anak susah", "anak ga mau"]):
+        return f"Untuk mengatasi GTM pada anak ({user_name}):\n1. Terapkan aturan makan maksimal 30 menit.\n2. Jangan beri camilan atau susu 2 jam menjelang jam makan utama.\n3. Buat variasi bentuk makanan yang menarik (bento art atau bola-bola nasi)."
+
+    # 5. Kasus Teh / Kopi / Pantangan
+    elif any(k in p for k in ["teh", "kopi", "kafein"]):
+        return f"Mengonsumsi teh atau kopi bersamaan dengan waktu makan **sangat tidak disarankan** karena kandungan asam tanin di dalamnya mengikat zat besi dari makanan hingga 70%, yang bisa memicu anemia dan lemas pada **{user_name}**!"
+
+    # 6. Kasus Tinggi Badan / Stunting / Pertumbuhan
+    elif any(k in p for k in ["tinggi", "pendek", "stunting", "tumbuh"]):
+        return f"Untuk mengoptimalkan tinggi badan **{user_name}** ({height} cm): Konsumsi protein hewani secara rutin untuk memicu hormon pertumbuhan (*IGF-1*), pastikan tidur nyenyak malam hari antara jam 22.00 - 02.00 (saat *Growth Hormone* diproduksi maksimal), dan lakukan olahraga peregangan tulang."
+
+    # 7. Kasus Berat Badan / Diet / Gemuk / Kurus
+    elif any(k in p for k in ["berat", "bb", "kurus", "gemuk", "diet", "turun berat"]):
+        return f"Pengaturan berat badan untuk **{user_name}** ({weight} kg) harus disesuaikan dengan Indeks Massa Tubuh (IMT):\n- **Jika ingin naik BB:** Tambahkan sumber kalori sehat (santan, alpukat, keju, daging berlemak sehat).\n- **Jika ingin turun BB:** Kurangi porsi gula, minyak jenuh, gorengan, dan perbanyak serat sayuran serta air putih."
+
+    # 8. Kasus Resep / Menu Makanan
+    elif any(k in p for k in ["resep", "menu", "masak", "makanan apa"]):
+        return f"Panduan menu nutrisi 7 hari terlengkap untuk kelompok usia **{cat_category_name(age_cat)}** sudah disediakan secara lengkap di **Tab 🥣 Resep Nutrisi 7 Hari** di atas, lengkap dengan bahan, cara memasak, serta link rujukan video YouTube-nya!"
+
+    # Default Cerdas Kontekstual Jika Topik Lain
+    else:
+        return f"Halo **{user_name}** ({age_cat})! Mengenai pertanyaan kamu (*\"{prompt}\"*): Berdasarkan standar gizi dan kesehatan, pastikan untuk selalu menjaga pola makan seimbang kaya Protein Hewani, cukupi hidrasi air putih, hindari stres, dan pantau terus grafik kesehatan tubuhmu di aplikasi ini. Ada detail spesifik lain yang ingin kamu tanyakan seputar menu, nutrisi, atau keluhan kesehatan?"
+
+def cat_category_name(cat):
+    return cat
