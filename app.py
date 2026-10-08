@@ -13,13 +13,13 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Styling CSS Modern dengan Background Gambar Pinterest
+# 2. Styling CSS Modern dengan Background Gambar Pinterest Terbaru
 st.markdown("""
 <style>
-    /* Background Animasi Anak-Anak dari Pinterest */
+    /* Background Animasi Anak-Anak dari Pinterest Terbaru */
     .stApp {
         background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), 
-                    url('https://i.pinimg.com/736x/17/74/9b/17749bb409215fba73f59778ff3bb6be.jpg');
+                    url('https://i.pinimg.com/736x/e9/67/8d/e9678dd9f3233a7528d3e9e3310bbed8.jpg');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
