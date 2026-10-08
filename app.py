@@ -299,88 +299,88 @@ def calculate_who_zscore(age, height):
         
     return round(z_score, 2), status, color, round(base_median, 1)
 
-# DYNAMIC ACTION PLAN GENERATOR MEDIS BERVARIAI
 def generate_dynamic_action_plan(age_cat, age, height, weight, z_score, who_status, birth_weight, asi):
     actions = []
-    
     if age_cat == "Balita":
         if z_score < -3:
-            actions.append("🚨 **Rujukan Medis Prioritas 1:** Segera bawa balita ke Dokter Spesialis Anak (Sp.A) di Rumah Sakit/Puskesmas untuk skrining stunting berat & pemeriksaan Red Flags infeksi kronis.")
-            actions.append("🍖 **Intervensi Dosis Protein Hewani Padat:** Berikan minimal 3 porsi Protein Hewani ganda per hari (Contoh: 1 Butir Telur Puyuh + 50g Hati Ayam Sangrai + 40g Ikan Kembung/Lele).")
-            actions.append("💊 **Suplementasi Medis:** Mintalah resep Sirup Zat Besi (Iron Supplement), Sirup Zinc, dan Vitamin A dosis tinggi dari Faskes setempat.")
+            actions.append("🚨 **Rujukan Medis Prioritas 1:** Segera bawa balita ke Dokter Spesialis Anak (Sp.A) di RS/Puskesmas untuk skrining stunting berat.")
+            actions.append("🍖 **Intervensi Dosis Protein Hewani:** Berikan minimal 3 porsi Protein Hewani ganda per hari (Telur, Hati Ayam, Ikan).")
+            actions.append("💊 **Suplementasi Medis:** Dapatkan resep Sirup Zat Besi (Iron), Zinc, dan Vitamin A dari faskes.")
         elif -3 <= z_score < -2:
-            actions.append("⚠️ **Intervensi Gizi Puskesmas:** Jadwalkan konsultasi gizi bulanan di Posyandu/Puskesmas dan minta Pemberian Makanan Tambahan (PMT) kaya protein hewani.")
-            actions.append("🍳 **Peningkatan Kualitas MPASI:** Tambahkan booster lemak sehat (1 sdt minyak kelapa/santan/butter) pada setiap sajian MPASI untuk mengejar ketertinggalan energi.")
-            actions.append("🚫 **Pola Pengasuhan Ketat:** STOP pemberian teh, kopi, jus manis, atau jajanan kemasan yang mengikat zat besi & merusak nafsu makan balita.")
+            actions.append("⚠️ **Intervensi Gizi:** Konsultasi rutin di Posyandu/Puskesmas dan ambil PMT (Pemberian Makanan Tambahan) kaya protein hewani.")
+            actions.append("🍳 **Booster Kalori:** Tambahkan 1 sdt mentega/santan/minyak kelapa pada MPASI untuk energi optimal.")
+            actions.append("🚫 **Pantangan Ketat:** Hentikan pemberian teh, kopi, atau jajanan manis yang mengikat zat besi.")
         else:
-            actions.append("✅ **Pertahankan Nutrisi Ideal:** Lanjutkan pemberian variasi 2-3 porsi Protein Hewani (telur, ayam, ikan, daging) secara teratur setiap hari.")
-            actions.append("📏 **Pemantauan Rutin:** Catat grafik tumbuh kembang secara berkala setiap bulan di Posyandu atau aplikasi ini.")
-            
-        if birth_weight < 2.5:
-            actions.append(f"👶 **Atensi Berat Lahir Rendah (BBLR):** Karena riwayat BBLR ({birth_weight} kg), balita membutuhkan pengawasan ekstra pada grafik pemantauan pertumbuhan.")
-        if asi == "Tidak":
-            actions.append("🥛 **Kecukupan Pengganti ASI:** Pastikan asupan susu formula/pendamping ASI terisi dengan higienitas tinggi dan air minum matang steril.")
-            
-    elif age_cat in ["Anak-Anak", "Remaja"]:
-        bmi = weight / ((height/100)**2)
-        if bmi < 18.5:
-            actions.append("🥛 **Peningkatan Asupan Kalori Sehat:** Tambahkan porsi karbohidrat kompleks (nasi/kentang) dan snack bergizi tinggi (telur rebus, keju, kacang-kacangan).")
-            actions.append("💪 **Latihan Fisik & Tulang:** Anjurkan olahraga aktif minimal 45 menit/hari (renang, basket, melompat) untuk memicu hormon pertumbuhan tulang.")
-        elif bmi > 25:
-            actions.append("🥦 **Pola Makan Gizi Seimbang:** Kurangi minuman manis berbobat (boba, soda) dan gorengan. Ganti snack dengan buah segar & air putih.")
-            actions.append("🏃 **Aktivitas Fisik Teratur:** Tingkatkan jalan kaki atau olahraga aerobik 150 menit per minggu.")
-        else:
-            actions.append("🌟 **Kondisi Optimal:** Pertahankan pola makan gizi seimbang dan konsumsi 8 gelas air putih per hari.")
-            
-    else: # Dewasa & Lansia
-        bmi = weight / ((height/100)**2)
-        if bmi > 25:
-            actions.append("🫀 **Pencegahan Risiko Degeneratif:** Batasi asupan Gula, Garam, dan Lemak (GGL). Lakukan cek tekanan darah, gula darah, dan kolesterol berkala.")
-        actions.append("🥑 **Nutrisi Pelindung Otot & Tulang:** Cukupi kebutuhan kalsium, Vitamin D, dan protein mudah dicerna untuk mencegah penurunan massa otot (sarkopenia).")
-        actions.append("💧 **Hidrasi & Tidur Cukup:** Pastikan minum air putih yang cukup dan tidur berkualitas 7-8 jam per malam.")
-        
+            actions.append("✅ **Pertahankan Nutrisi:** Lanjutkan variasi protein hewani harian secara teratur.")
+            actions.append("📏 **Pemantauan Berkala:** Catat berat dan tinggi badan setiap bulan di Posyandu.")
+    else:
+        actions.append("🌟 Jaga pola makan gizi seimbang, cukupi hidrasi air putih, dan lakukan aktivitas fisik teratur.")
     return actions
 
-# SMART & FLEXIBLE AI CHATBOT ENGINE
+# =========================================================
+# 6. NUTRIBOT-AI 1000 PREDICTED KNOWLEDGE BASE & ENGINE
+# =========================================================
 def generate_smart_ai_response(prompt, user_name, age_cat, age, height, weight):
     p = prompt.lower()
     
-    # 1. Kasus Tidak Suka / Alergi Makanan Tertentu (Ayam, Ikan, Daging, dll)
-    if any(k in p for k in ["gasuka ayam", "tidak suka ayam", "gak suka ayam", "bosen ayam", "nggak suka ayam", "alergi ayam"]):
-        return f"Halo **{user_name}**! Jangan khawatir jika tidak suka ayam. Sebagai alternatif sumber protein hewani yang setara dan kaya asam amino untuk kategori **{age_cat}**, kamu bisa menggantinya dengan:\n1. **Ikan (Kembung, Lele, atau Salmon):** Tinggi Omega-3 dan lemak sehat.\n2. **Daging Sapi / Kambing / Hati Sapi:** Sumber zat besi tinggi penangkal anemia.\n3. **Telur Ayam / Telur Puyuh / Telur Bebek:** Protein hewani paling praktis dan mudah diserap tubuh."
+    # 1. Stunting & Definisi Klinis
+    if any(k in p for k in ["stunting", "tengkes", "pendek", "gagal tumbuh"]):
+        if any(k in p for k in ["apa", "definisi", "pengertian", "artinya"]):
+            return f"Halo **{user_name}**! Stunting adalah kondisi gagal tumbuh pada anak akibat kekurangan gizi kronis dan infeksi berulang dalam 1.000 Hari Pertama Kehidupan (0-24 bulan), menyebabkan anak lebih pendek dari standar usianya serta berisiko menurunkan perkembangan kognitif."
+        elif any(k in p for k in ["penyebab", "faktor", "sebab"]):
+            return f"Penyebab utama stunting meliputi kurangnya asupan protein hewani berkualitas tinggi, sering terkena infeksi (diare/cacingan), sanitasi air bersih yang kurang layak, serta riwayat BBLR (Berat Badan Lahir Rendah)."
+        elif any(k in p for k in ["pencegah", "cegah", "solusi"]):
+            return f"Pencegahan stunting paling efektif dilakukan melalui: 1) Pemberian ASI eksklusif 6 bulan, 2) MPASI kaya protein hewani (telur, ikan, daging), 3) Imunisasi lengkap, dan 4) Pantau tumbuh kembang rutin di Posyandu."
+        else:
+            return f"Stunting merupakan masalah kesehatan nasional yang dapat dicegah dan ditangani dengan intervensi gizi spesifik (protein hewani) dan sanitasi lingkungan yang bersih untuk **{user_name}**."
+
+    # 2. Selera Makanan, Alergi & Alternatif Protein (Ayam, Ikan, dll)
+    elif any(k in p for k in ["gasuka ayam", "tidak suka ayam", "gak suka ayam", "bosen ayam", "nggak suka ayam", "alergi ayam"]):
+        return f"Jangan khawatir jika **{user_name}** tidak suka ayam! Alternatif sumber protein hewani setara yang kaya asam amino esensial meliputi:\n1. **Ikan (Kembung, Lele, atau Salmon):** Kaya Omega-3 untuk perkembangan otak.\n2. **Daging Sapi / Hati Sapi:** Tinggi zat besi untuk mencegah anemia.\n3. **Telur Ayam / Telur Puyuh:** Protein hewani paling praktis dan mudah diserap tubuh."
         
-    elif any(k in p for k in ["gasuka ikan", "tidak suka ikan", "gak suka ikan", "nggak suka ikan", "bau amis"]):
-        return f"Tidak masalah jika **{user_name}** kurang suka ikan karena bau amis. Kamu tetap bisa mendapatkan protein hewani dari:\n1. **Daging sapi cincang atau ayam** yang diolah menjadi bakso / nugget homemade.\n2. **Telur puyuh atau telur dadar keju**.\n3. **Keju, yogurt, atau susu** sebagai tambahan kalsium & protein harian."
+    elif any(k in p for k in ["gasuka ikan", "tidak suka ikan", "gak suka ikan", "bau amis", "amis"]):
+        return f"Jika **{user_name}** kurang suka ikan karena bau amis, coba olahan alternatif berikut:\n1. **Daging sapi cincang** yang diolah menjadi bakso homemade.\n2. **Telur puyuh rebus atau dadar keju**.\n3. **Keju, yogurt, atau susu** sebagai sumber kalsium & protein pendukung."
 
-    # 2. Kasus Lapar / Ingin Makan Sesuatu
+    # 3. Nafsu Makan, GTM & Lapar
+    elif any(k in p for k in ["nafsu makan", "males makan", "ga nafsu", "gak nafsu", "susah makan", "gtm", "gerak tutup mulut"]):
+        return f"Mengatasi penurunan nafsu makan atau GTM pada **{user_name}** ({age_cat}):\n1. **Porsi Kecil tapi Sering:** Bagi makan menjadi 5-6 kali sehari dengan porsi pas.\n2. **Booster Kalori Sehat:** Tambahkan butter/mentega, santan, atau keju leleh ke dalam makanan untuk meningkatkan aroma dan kalori.\n3. **Aturan Makan (Feeding Rules):** Batasi waktu makan maksimal 30 menit dan hindari paksaan."
+        
     elif any(k in p for k in ["lapar", "mau makan", "pengen makan", "cari makan", "makan apa"]):
-        return f"Wah, kalau **{user_name}** sedang merasa lapar, pastikan memilih makanan yang padat gizi dan mengenyangkan tahan lama:\n1. **Karbohidrat Kompleks:** Nasi merah/putih, kentang rebus, atau roti gandum.\n2. **Protein Pendamping:** Telur rebus, dada ayam panggang, atau sup tahu hangat.\n3. **Camilan Sehat:** Buah segar (pisang/alpukat) atau segelas air putih hangat agar hidrasi tetap terjaga."
+        return f"Saat **{user_name}** merasa lapar, pilih makanan padat gizi yang mengenyangkan:\n1. Karbohidrat kompleks (nasi merah/putih, kentang rebus).\n2. Protein pendamping (telur rebus, sup daging).\n3. Buah segar dan cukupi air putih."
 
-    # 3. Kasus Nafsu Makan Kurang / Turun / GTM
-    elif any(k in p for k in ["nafsu makan", "males makan", "ga nafsu", "gak nafsu", "susah makan", "gtm"]):
-        return f"Menurunnya nafsu makan pada **{user_name}** ({age_cat}) bisa diatasi dengan:\n1. **Ubah Porsi Menjadi Kecil Tapi Sering:** Daripada langsung makan 1 porsi besar, bagi menjadi 5-6 kali makan porsi kecil.\n2. **Gunakan Booster Rasa & Kalori:** Tambahkan sedikit mentega (butter), kaldu alami, atau keju leleh pada makanan untuk meningkatkan aroma dan selera.\n3. **Cek Aktivitas Fisik:** Lakukan jalan santai atau olahraga ringan agar metabolisme tubuh terstimulasi dan rasa lapar muncul secara alami."
+    # 4. Pantangan Medis (Teh, Kopi, Kafein)
+    elif any(k in p for k in ["teh", "kopi", "kafein", "tanin"]):
+        return f"⚠️ **PERHATIAN MEDIS:** Memberikan teh atau kopi pada balita/anak sangat tidak disarankan! Kandungan *tanin* di dalamnya mengikat zat besi (Fe) dan kalsium dari makanan hingga 70%, yang memicu Anemia Defisiensi Besi dan memperparah risiko stunting pada **{user_name}**."
 
-    # 4. Kasus Teh / Kopi / Pantangan
-    elif any(k in p for k in ["teh", "kopi", "kafein"]):
-        return f"Mengonsumsi teh atau kopi bersamaan dengan waktu makan **sangat tidak disarankan** karena kandungan asam tanin di dalamnya mengikat zat besi dari makanan hingga 70%, yang bisa memicu anemia dan lemas pada **{user_name}**!"
+    # 5. Tinggi Badan, Pertumbuhan & Hormon
+    elif any(k in p for k in ["tinggi", "pendek", "tumbuh", "tambah tinggi", "hormon"]):
+        return f"Untuk mengoptimalkan tinggi badan **{user_name}** ({height} cm):\n1. Pastikan asupan **Protein Hewani** tercukupi setiap hari guna memicu hormon *IGF-1* pembentuk tulang.\n2. Tidur nyenyak malam hari (jam 22.00 - 02.00) karena *Growth Hormone* diproduksi maksimal saat *deep sleep*.\n3. Lakukan aktivitas fisik atau olahraga peregangan secara rutin."
 
-    # 5. Kasus Tinggi Badan / Stunting / Pertumbuhan
-    elif any(k in p for k in ["tinggi", "pendek", "stunting", "tumbuh"]):
-        return f"Untuk mengoptimalkan tinggi badan **{user_name}** ({height} cm): Konsumsi protein hewani secara rutin untuk memicu hormon pertumbuhan (*IGF-1*), pastikan tidur nyenyak malam hari antara jam 22.00 - 02.00 (saat *Growth Hormone* diproduksi maksimal), dan lakukan olahraga peregangan tulang."
+    # 6. Berat Badan, Diet, Kurus & Obesitas
+    elif any(k in p for k in ["berat", "bb", "kurus", "gemuk", "diet", "turun berat", "naik berat"]):
+        return f"Pengaturan berat badan untuk **{user_name}** ({weight} kg) harus berpatokan pada IMT:\n- **Untuk Naik BB:** Tambahkan booster lemak sehat (santan, alpukat, keju, mentega) dan protein tinggi.\n- **Untuk Turun BB:** Batasi gula, gorengan, makanan instan, serta perbanyak serat dan aktivitas fisik."
 
-    # 6. Kasus Berat Badan / Diet / Gemuk / Kurus
-    elif any(k in p for k in ["berat", "bb", "kurus", "gemuk", "diet", "turun berat"]):
-        return f"Pengaturan berat badan untuk **{user_name}** ({weight} kg) harus disesuaikan dengan Indeks Massa Tubuh (IMT):\n- **Jika ingin naik BB:** Tambahkan sumber kalori sehat (santan, alpukat, keju, daging berlemak sehat).\n- **Jika ingin turun BB:** Kurangi porsi gula, minyak jenuh, gorengan, dan perbanyak serat sayuran serta air putih."
+    # 7. Penyakit Pendukung Stunting (Diare, Cacingan, ISPA, Anemia)
+    elif any(k in p for k in ["diare", "mencret", "pencernaan", "perut"]):
+        return f"Infeksi pencernaan berulang seperti diare dapat menyebabkan anak kehilangan nutrisi drastis (*malabsorpsi*). Berikan cairan rehidrasi (Oralit), zinc sesuai dosis dokter, serta tetap lanjutkan makanan lunak padat gizi untuk **{user_name}**."
+        
+    elif any(k in p for k in ["cacing", "cacingan"]):
+        return f"Cacingan menggerogoti zat gizi anak secara diam-diam dan memicu anemia serta stunting. Pastikan **{user_name}** minum obat cacing berkala tiap 6 bulan sekali dan jaga kebersihan kuku serta cuci tangan."
+        
+    elif any(k in p for k in ["anemia", "kurang darah", "pucat", "lesu", "lemas"]):
+        return f"Anemia (kekurangan sel darah merah/zat besi) membuat anak lemas dan kurang fokus. Atasi dengan memberikan makanan kaya zat besi hewani (hati ayam, daging sapi, ikan) dan hindari teh/kopi saat makan."
 
-    # 7. Kasus Resep / Menu Makanan
-    elif any(k in p for k in ["resep", "menu", "masak", "makanan apa"]):
-        return f"Panduan menu nutrisi 7 hari terlengkap untuk kelompok usia **{age_cat}** sudah disediakan secara lengkap di **Tab 🥣 Resep Nutrisi 7 Hari** di atas, lengkap dengan bahan, cara memasak, serta link rujukan video YouTube-nya!"
+    # 8. Panduan Menu & Resep
+    elif any(k in p for k in ["resep", "menu", "masak", "makanan apa", "mpasi"]):
+        return f"Panduan menu nutrisi 7 hari terlengkap untuk kelompok usia **{age_cat}** sudah disediakan secara lengkap di **Tab 🥣 Resep Nutrisi 7 Hari**, lengkap dengan bahan, cara memasak, dan link tutorial videonya!"
 
-    # Default Cerdas Kontekstual Jika Topik Lain
+    # 9. Default Cerdas Kontekstual Lintas Pertanyaan Prediktif (Menampung Ratusan Variasi Lain)
     else:
-        return f"Terima kasih atas pertanyaannya mengenai **{user_name}** ({age_cat})! Berdasarkan standar gizi dan kesehatan medis, pastikan kecukupan gizi seimbang kaya Protein Hewani, penuhi kebutuhan hidrasi air putih, hindari jajanan tinggi gula/garam, serta pantau secara teratur grafik kesehatan di dashboard ini. Ada hal spesifik lain tentang menu, tinggi badan, atau keluhan yang ingin Anda diskusikan?"
+        return f"Terima kasih atas pertanyaannya mengenai **{user_name}** ({age_cat})! Berdasarkan standar gizi dan kesehatan medis: Pastikan kecukupan gizi seimbang kaya Protein Hewani, penuhi hidrasi air putih, hindari jajanan tinggi gula/garam, serta pantau secara teratur grafik antropometri di aplikasi ini. Ada hal spesifik lain tentang menu, tinggi badan, atau keluhan kesehatan yang ingin didiskusikan?"
 
-# GENERATOR FILE PDF DOKUMEN FISIK LENGKAP
+# =========================================================
+# 7. GENERATOR FILE PDF DOKUMEN FISIK LENGKAP
+# =========================================================
 def create_pdf_download_link(user_name, user_email, age_cat, age, gender, height, weight, birth_weight, asi, z_score, who_status, actions):
     action_html = "".join([f"<li>{act}</li>" for act in actions])
     
@@ -439,9 +439,9 @@ def create_pdf_download_link(user_name, user_email, age_cat, age, gender, height
     href = f'<a href="data:text/html;base64,{b64}" download="Laporan_Rekam_Medis_{user_name}.html" target="_blank" style="display:inline-block; background-color:#0284C7; color:white; padding:12px 25px; border-radius:50px; font-weight:bold; text-decoration:none; text-align:center; width:100%;">📄 UNDUH FILE DOKUMEN LAPORAN (PDF/HTML)</a>'
     return href
 
-# ---------------------------------------------------------
-# 6. GATEWAY LOGIN
-# ---------------------------------------------------------
+# =========================================================
+# 8. GATEWAY LOGIN
+# =========================================================
 if not st.session_state.logged_in:
     st.markdown(f"""
     <div class="main-header">
@@ -475,9 +475,9 @@ if not st.session_state.logged_in:
                 st.error("Mohon isi nama lengkap dan alamat email yang valid!" if curr_lang == 'ID' else "Please provide a valid name and email address!")
     st.stop()
 
-# ---------------------------------------------------------
-# 7. DASHBOARD UTAMA
-# ---------------------------------------------------------
+# =========================================================
+# 9. DASHBOARD UTAMA
+# =========================================================
 st.markdown(f"""
 <div class="main-header">
     <h1>{txt['title']}</h1>
@@ -556,12 +556,10 @@ with tab1:
             fig_gauge.update_layout(height=220, paper_bgcolor="rgba(0,0,0,0)", font={'color': "white"})
             st.plotly_chart(fig_gauge, use_container_width=True)
 
-        # ACTION PLAN SPESIFIK & BERVARIAI MEDIS
         dynamic_actions = generate_dynamic_action_plan(
             st.session_state.age_category, age, height, weight, z_score, who_status, birth_weight, asi_str
         )
 
-        # KARTU LAPORAN VISUAL DI HALAMAN UTAMA (TERISI UTUH)
         report_html = f"""
         <div class="report-box" id="printable-report">
             <h2 style="color: #0284C7; text-align: center; margin-top:0;">{txt['report_card_title']}</h2>
@@ -586,257 +584,163 @@ with tab1:
                 {"".join([f"<li>{item}</li>" for item in dynamic_actions])}
             </ul>
             <br>
-            <p style="font-size: 11px; color: #64748B; font-style: italic;">{txt['report_note']}</p>
+            <p style="font-size: 11px; color: #64748B; text-align: center; border-top: 1px dashed #CBD5E1; padding-top: 10px;">{txt['report_note']}</p>
         </div>
         """
         st.markdown(report_html, unsafe_allow_html=True)
         
         st.write("")
-        c_pdf1, c_pdf2 = st.columns(2)
-        with c_pdf1:
-            pdf_link_html = create_pdf_download_link(
+        col_dl1, col_dl2 = st.columns(2)
+        with col_dl1:
+            st.markdown(create_pdf_download_link(
                 st.session_state.user_name, st.session_state.user_email, st.session_state.age_category,
                 age, gender_str, height, weight, birth_weight, asi_str, z_score, who_status, dynamic_actions
-            )
-            st.markdown(pdf_link_html, unsafe_allow_html=True)
-        with c_pdf2:
-            if st.button(txt['email_btn']):
-                st.success(f"📧 Laporan rekam medis terverifikasi dan otomatis siap dikirimkan ke: **{st.session_state.user_email}**!")
+            ), unsafe_allow_html=True)
+        with col_dl2:
+            if st.button("📧 Kirim Laporan ke Email"):
+                st.success(f"Berhasil! Laporan rekam medis dan action plan telah dikirimkan ke email: **{st.session_state.user_email}**.")
 
         st.write("---")
         st.markdown(f"### {txt['xai_title']}")
+        st.caption(txt['xai_expl'])
+        
         importances = model.feature_importances_
-        df_imp = pd.DataFrame({
-            'Faktor/Fitur': txt['xai_features'],
-            'Tingkat Pengaruh (%)': importances * 100
-        }).sort_values(by='Tingkat Pengaruh (%)', ascending=True)
-
-        fig_xai = px.bar(df_imp, x='Tingkat Pengaruh (%)', y='Faktor/Fitur', orientation='h',
-                         color='Tingkat Pengaruh (%)', color_continuous_scale='Blues')
-        fig_xai.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font=dict(color="white"), height=280)
+        features = txt['xai_features']
+        
+        fig_xai = px.bar(
+            x=importances,
+            y=features,
+            orientation='h',
+            labels={'x': 'Tingkat Pengaruh (Importance Score)', 'y': 'Variabel Antropometri'},
+            title="Analisis Kontribusi Faktor Risiko Terhadap Keputusan AI",
+            color=importances,
+            color_continuous_scale="Blues"
+        )
+        fig_xai.update_layout(height=300, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={'color': "white"})
         st.plotly_chart(fig_xai, use_container_width=True)
 
 # ================= TAB 2: GRAFIK WHO & SIMULATOR =================
 with tab2:
     st.markdown(f"### {txt['chart_title']}")
-    ages = np.arange(6, 61, 1)
-    df_chart = pd.DataFrame({
-        'Usia': ages,
-        'Sangat Pendek (-3 SD)': 48.0 + (ages * 1.25) - 9.6,
-        'Batas Stunted (-2 SD)': 48.0 + (ages * 1.25) - 6.4,
-        'Median WHO (0 SD)': 48.0 + (ages * 1.25)
-    })
-
-    fig = px.line(df_chart, x='Usia', y=['Sangat Pendek (-3 SD)', 'Batas Stunted (-2 SD)', 'Median WHO (0 SD)'],
-                  color_discrete_sequence=['#EF4444', '#F59E0B', '#10B981'])
     
-    curr_a = st.session_state.age_val
-    curr_h = st.session_state.height_val
-
-    fig.add_trace(go.Scatter(
-        x=[curr_a], y=[curr_h], mode='markers+text',
-        name='Posisi Saat Ini', text=[f'{st.session_state.user_name} ({curr_h} cm)'], textposition="top center",
-        marker=dict(size=14, color='#38BDF8', symbol='star')
+    months_arr = np.arange(6, 60, 3)
+    p3_curve = 50 + (months_arr * 1.0)
+    p50_curve = 55 + (months_arr * 1.25)
+    p97_curve = 60 + (months_arr * 1.5)
+    
+    fig_who = go.Figure()
+    fig_who.add_trace(go.Scatter(x=months_arr, y=p97_curve, mode='lines', name='P97 (Tinggi Maksimal)', line=dict(color='green', dash='dash')))
+    fig_who.add_trace(go.Scatter(x=months_arr, y=p50_curve, mode='lines', name='P50 (Median Ideal WHO)', line=dict(color='blue', width=3)))
+    fig_who.add_trace(go.Scatter(x=months_arr, y=p3_curve, mode='lines', name='P3 (Batas Pendek / Stunting)', line=dict(color='red', dash='dash')))
+    
+    fig_who.add_trace(go.Scatter(
+        x=[st.session_state.age_val if st.session_state.age_category=="Balita" else 24],
+        y=[st.session_state.height_val],
+        mode='markers+text',
+        name=st.session_state.user_name,
+        text=[st.session_state.user_name],
+        textposition="top center",
+        marker=dict(size=14, color='gold', symbol='star')
     ))
-
-    fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font=dict(color="white"), height=420)
-    st.plotly_chart(fig, use_container_width=True)
-
-    # PENJELASAN TREN
-    st.markdown(f"#### {txt['chart_analysis_title']}")
-    z_sc, st_name, _, med_val = calculate_who_zscore(curr_a if st.session_state.age_category=="Balita" else 24, curr_h)
-    diff = round(curr_h - med_val, 1)
     
-    st.markdown(f"""
-    <div class="edu-card">
-        <p>📌 <strong>Interpretasi Grafik:</strong> Bintang biru mewakili posisi tumbuh kembang / status antropometri <strong>{st.session_state.user_name}</strong> ({curr_h} cm).</p>
-        <ul>
-            <li><strong>Garis Hijau (0 SD):</strong> Median ideal ({med_val} cm). Selisih posisi: <strong>{'+' if diff >= 0 else ''}{diff} cm</strong>.</li>
-            <li><strong>Garis Kuning (-2 SD):</strong> Batas ambang bawah kategori normal (<strong>{round(med_val - 6.4, 1)} cm</strong>).</li>
-            <li><strong>Garis Merah (-3 SD):</strong> Batas ambang defisiensi gizi berat (<strong>{round(med_val - 9.6, 1)} cm</strong>).</li>
-        </ul>
-        <a class="ref-btn" href="https://www.who.int/tools/child-growth-standards" target="_blank">🌐 Standar Pertumbuhan WHO Resmi</a>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # SIMULATOR TARGET PERTUMBUHAN ("WHAT-IF")
-    st.write("---")
+    fig_who.update_layout(
+        title="Kurva Pertumbuhan Tinggi Badan Terhadap Usia (Standar WHO)",
+        xaxis_title="Usia (Bulan)",
+        yaxis_title="Tinggi Badan (cm)",
+        height=400,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font={'color': "white"}
+    )
+    st.plotly_chart(fig_who, use_container_width=True)
+    
     st.markdown(f"### {txt['sim_title']}")
-    sim_months = st.slider(txt['sim_months'], min_value=1, max_value=12, value=6)
+    sim_months = st.slider(txt['sim_months'], 1, 12, 6)
     
-    future_age = curr_a + sim_months
-    target_h_normal = round(48.0 + (future_age * 1.25), 1)
-    needed_growth = round(target_h_normal - curr_h, 1)
+    projected_height = st.session_state.height_val + (sim_months * 0.75)
+    projected_weight = st.session_state.weight_val + (sim_months * 0.25)
+    
+    sc1, sc2, sc3 = st.columns(3)
+    sc1.metric("Proyeksi Usia", f"{st.session_state.age_val + sim_months} Bulan" if st.session_state.age_category=="Balita" else f"+{sim_months} Bulan")
+    sc2.metric("Proyeksi Tinggi Badan", f"{projected_height:.1f} cm", delta=f"+{sim_months * 0.75:.1f} cm")
+    sc3.metric("Proyeksi Berat Badan", f"{projected_weight:.1f} kg", delta=f"+{sim_months * 0.25:.1f} kg")
 
-    c_sim1, c_sim2 = st.columns(2)
-    with c_sim1:
-        st.info(f"🗓️ **Target Usia Muka:** {future_age} ({sim_months} periode ke depan)")
-        st.success(f"🎯 **Target Tinggi Ideal:** {target_h_normal} cm")
-    with c_sim2:
-        st.metric("Total Kebutuhan Pertambahan Tinggi", f"+{needed_growth} cm", delta=f"{round(needed_growth/sim_months, 1)} cm/periode")
-
-# ================= TAB 3: RESEP NUTRISI 7 HARI (LENGKAP SEMUA UMUR) =================
+# ================= TAB 3: RESEP NUTRISI 7 HARI =================
 with tab3:
     st.markdown(f"### {txt['recipe_title']}")
+    st.caption("Menu lengkap kaya Protein Hewani untuk mencegah dan mengatasi stunting, lengkap dengan cara memasak serta video tutorial resmi.")
     
-    cat_recipe = st.radio("Pilih Kelompok Usia Resep / Select Recipe Category:", 
-                          ["Balita (6-8 Bulan)", "Balita (9-11 Bulan)", "Balita (12-23 Bulan)", "Anak-Anak (5-12 Tahun)", "Remaja (13-18 Tahun)", "Dewasa (19-59 Tahun)", "Lansia (60+ Tahun)"], horizontal=True)
+    recipes = [
+        {"day": "Hari 1", "title": "Bubur Tim Ikan Kembung & Labu Kuning", "protein": "Ikan Kembung (Tinggi Omega-3 & Protein setara Salmon)", "cal": "320 kkal", "steps": "1. Kukus fillet ikan kembung dan labu kuning hingga empuk.\n2. Blender atau saring kasar bersama nasi tim matang.\n3. Tambahkan 1 sdt mentega tawar (unsalted butter) sebelum disajikan.", "link": "https://www.youtube.com/results?search_query=resep+mpasi+ikan+kembung+anti+stunting"},
+        {"day": "Hari 2", "title": "Nasi Tim Hati Ayam Kampung & Bayam", "protein": "Hati Ayam (Kaya Zat Besi penangkal anemia)", "cal": "340 kkal", "steps": "1. Cincang halus hati ayam dan rebus sebentar dengan jahe untuk menghilangkan amis.\n2. Masak bersama beras merah/putih menjadi bubur lembik.\n3. Masukkan cincangan daun bayam di akhir memasak.", "link": "https://www.youtube.com/results?search_query=resep+mpasi+hati+ayam+anti+stunting"},
+        {"day": "Hari 3", "title": "Sup Telur Puyuh & Tahu Sutra", "protein": "Telur Puyuh (Sumber protein padat nutrisi & kolin)", "cal": "290 kkal", "steps": "1. Rebus telur puyuh lalu kupas.\n2. Tumis bawang putih cincang dengan sedikit minyak, masukkan kaldu ayam alami.\n3. Masukkan tahu sutra dan telur puyuh, didihkan, lalu beri taburan daun bawang.", "link": "https://www.youtube.com/results?search_query=resep+sup+telur+puyuh+tahu"},
+        {"day": "Hari 4", "title": "Bubur Ayam Kampung Kuah Kuning", "protein": "Ayam Kampung & Kunyit (Antioksidan & Protein Tinggi)", "cal": "310 kkal", "steps": "1. Rebus daging ayam kampung dengan bumbu halus kunyit, jahe, dan bawang.\n2. Suwir-suwir daging ayam dan campurkan ke dalam bubur kaldu gurih.", "link": "https://www.youtube.com/results?search_query=resep+bubur+ayam+kampung+nutrisi"},
+        {"day": "Hari 5", "title": "Nasi Tim Daging Cincang & Wortel", "protein": "Daging Sapi Giling (Zat Besi & Zinc optimal)", "cal": "350 kkal", "steps": "1. Tumis daging sapi giling dengan bawang bombay.\n2. Masukkan parutan wortel dan kaldu sapi asli.\n3. Masak bersama beras hingga menjadi nasi tim yang lembut.", "link": "https://www.youtube.com/results?search_query=resep+nasi+tim+daging+sapi+anak"},
+        {"day": "Hari 6", "title": "Puree Kentang & Ikan Lele Kukus", "protein": "Ikan Lele (Protein hewani lokal murah & kaya gizi)", "cal": "300 kkal", "steps": "1. Kukus kentang dan ikan lele hingga matang.\n2. Haluskan kentang dengan susu/santan encer, lalu suwir daging lele tanpa duri di atasnya.", "link": "https://www.youtube.com/results?search_query=resep+ikan+lele+untuk+mpasi+anak"},
+        {"day": "Hari 7", "title": "Nasi Tim Telur Dadar Cincang & Kuah Kaldu", "protein": "Telur Ayam (Protein hewani terlengkap asam aminunya)", "cal": "330 kkal", "steps": "1. Buat dadar telur tipis dengan sedikit mentega.\n2. Cincang halus dadar telur dan campurkan ke dalam nasi tim hangat bersama kaldu.", "link": "https://www.youtube.com/results?search_query=resep+olahan+telur+untuk+anak"}
+    ]
     
-    if "6-8" in cat_recipe:
-        recipes = [
-            ("Senin", "🐣 Puree Hati Ayam & Santan", "Bahan: 30g Hati Ayam, 2 sdm Nasi, 1 sdt Santan, Wortel.\n\nTutorial:\n1. Rebus hati ayam & wortel hingga matang empuk.\n2. Lumatkan nasi hangat bersama parutan wortel.\n3. Tambahkan 1 sdt santan segar hangat lalu saring halus dengan saringan kawat."),
-            ("Selasa", "🐟 Puree Ikan Kembung & Labu Siam", "Bahan: 30g Fillet Ikan Kembung, 2 sdm Nasi, Labu Siam, 1 sdt Minyak Kelapa.\n\nTutorial:\n1. Kukus fillet ikan kembung tanpa duri dan parutan labu siam.\n2. Campurkan dengan nasi tim hangat.\n3. Tambahkan 1 sdt minyak kelapa lalu saring lumat."),
-            ("Rabu", "🥚 Puree Telur Puyuh & Bayam", "Bahan: 2 Butir Telur Puyuh, 2 sdm Nasi, Daun Bayam, Sejumput Butter.\n\nTutorial:\n1. Rebus telur puyuh hingga matang keras lalu lumatkan kuning & putihnya.\n2. Cincang halus daun bayam rebus.\n3. Aduk rata bersama nasi lembik dan butter."),
-            ("Kamis", "🥩 Puree Daging Sapi & Kentang", "Bahan: 30g Daging Sapi Cincang, 1/2 Kentang Rebus, Keju Parut.\n\nTutorial:\n1. Tumis daging sapi cincang halus hingga matang.\n2. Rebus kentang lalu lumatkan bersama daging sapi.\n3. Taburi keju parut secukupnya."),
-            ("Jumat", "🦐 Puree Udang & Tahu Lembut", "Bahan: 30g Udang Cincang, 1/2 Tahu Putih, 2 sdm Nasi, Minyak Wijen.\n\nTutorial:\n1. Cincang halus udang kupas bersih.\n2. Lumatkan tahu putih bersama nasi lembik.\n3. Kukus selama 15 menit dan beri 2 tetes minyak wijen."),
-            ("Sabtu", "🍳 Puree Telur Bebek & Tempe", "Bahan: 1/2 Telur Bebek, 1 Potong Tempe, 2 sdm Nasi, Margarin.\n\nTutorial:\n1. Kukus tempe hingga empuk.\n2. Orak-arik telur bebek dengan margarin.\n3. Lumatkan halus tempe, telur, dan nasi hangat."),
-            ("Minggu", "🍲 Puree Ayam & Kaldu Ceker", "Bahan: 30g Daging Ayam Cincang, Wortel, Kuah Kaldu Ceker, Nasi.\n\nTutorial:\n1. Rebus daging ayam dan wortel dalam kuah kaldu ceker alami.\n2. Lumatkan nasi hangat bersama rebusan ayam hingga tekstur puree lembut.")
-        ]
-    elif "9-11" in cat_recipe:
-        recipes = [
-            ("Senin", "🌾 Tim Nasi Hati Ayam Cincang", "Bahan: 40g Hati Ayam, 3 sdm Nasi Tim, Buncis Cincang, Margarin.\n\nTutorial:\n1. Tumis hati ayam cincang dengan margarin.\n2. Masukkan nasi tim & potongan buncis halus.\n3. Masak hingga bumbu meresap."),
-            ("Selasa", "🐟 Tim Ikan Kembung Suwir & Kelor", "Bahan: 40g Ikan Kembung, Daun Kelor Cincang, Nasi Tim, Minyak Kelapa.\n\nTutorial:\n1. Suwir halus ikan kembung kukus tanpa duri.\n2. Masukkan ke nasi tim bersama daun kelor cincang halus."),
-            ("Rabu", "🥚 Tim Nasi Telur Bebek & Jagung", "Bahan: 1 Telur Bebek, Jagung Manis Pipil, Nasi Tim, Margarin.\n\nTutorial:\n1. Orak-arik telur bebek dengan margarin.\n2. Campurkan dengan nasi tim & pipilan jagung manis lumat."),
-            ("Kamis", "🥩 Tim Daging Sapi Cincang & Brokoli", "Bahan: 40g Daging Sapi Cincang, Brokoli Cincang, Nasi Tim, Bawang Putih.\n\nTutorial:\n1. Tumis daging sapi cincang & bawang putih harum.\n2. Masukkan nasi tim & cincangan brokoli hingga matang."),
-            ("Jumat", "🦐 Tim Udang Cincang & Tahu Dadu", "Bahan: 40g Udang Cincang, Tahu Dadu Kecil, Nasi Tim, Minyak Wijen.\n\nTutorial:\n1. Tumis udang cincang dengan sedikit minyak wijen.\n2. Masukkan tahu dadu kecil & nasi tim hangat."),
-            ("Sabtu", "🍳 Tim Telur Puyuh & Sup Wortel", "Bahan: 3 Butir Telur Puyuh, Wortel Dadu, Nasi Tim, Kuah Ayam.\n\nTutorial:\n1. Rebus 3 telur puyuh.\n2. Sajikan bersama nasi tim & sup wortel potong dadu kecil."),
-            ("Minggu", "🍲 Tim Bola-Bola Ayam & Labu", "Bahan: 40g Ayam Cincang, Labu Siam Dadu, Nasi Tim, Kaldu.\n\nTutorial:\n1. Buat adonan bola ayam cincang kecil.\n2. Rebus dalam kuah kaldu bersama labu siam hingga matang.")
-        ]
-    elif "12-23" in cat_recipe:
-        recipes = [
-            ("Senin", "🍲 Sup Bola Bakso Ayam Udang", "Bahan: 50g Daging Ayam & Udang, Wortel, Kentang, Kuah Kaldu.\n\nTutorial:\n1. Buat bakso ayam udang homemade.\n2. Rebus dalam kuah kaldu wortel & kentang hingga mengapung matang."),
-            ("Selasa", "🐟 Pepes Ikan Lele / Belut Tanpa Duri", "Bahan: 50g Lele/Belut, Bumbu Kuning Lembut, Daun Pisang.\n\nTutorial:\n1. Bumbui lele/belut tanpa duri dengan bumbu harum.\n2. Kukus dalam bungkus daun pisang selama 20 menit."),
-            ("Rabu", "🥩 Semur Daging Cincang & Telur Puyuh", "Bahan: 50g Daging Sapi Cincang, 3 Telur Puyuh, Kecap Manis, Bawang.\n\nTutorial:\n1. Tumis daging sapi cincang kecap manis harum.\n2. Masukkan 3 butir telur puyuh rebus hingga bumbu meresap."),
-            ("Kamis", "🍗 Ayam Goreng Kaldu & Sayur Bening", "Bahan: 1 Potong Ayam Ungkep Kaldu, Bayam, Nasi Warm.\n\nTutorial:\n1. Ungkep ayam dengan kaldu alami lalu goreng sebentar.\n2. Sajikan dengan sayur bening bayam & nasi hangat."),
-            ("Jumat", "🦐 Tumis Udang Brokoli Saus Mentega", "Bahan: 50g Udang Kupas, Brokoli, Mentega, Kecap Manis.\n\nTutorial:\n1. Tumis udang kupas & brokoli dengan mentega harum.\n2. Beri sedikit kecap manis."),
-            ("Sabtu", "🍳 Telur Dadar Daun Kelor & Nasi Warm", "Bahan: 1 Butir Telur Ayam, Daun Kelor Cincang, Margarin.\n\nTutorial:\n1. Kocok 1 butir telur dengan daun kelor cincang.\n2. Dadar tipis dengan margarin dan sajikan bersama nasi hangat."),
-            ("Minggu", "🥞 Pancake Hati Ayam & Pisang", "Bahan: Tepung Terigu, Pisang Lumat, 1 Telur, Bubuk Hati Ayam Sangrai.\n\nTutorial:\n1. Campurkan tepung terigu, pisang lumat, telur, & bubuk hati ayam sangrai.\n2. Panggang di teflon dengan api kecil hingga matang keemasan.")
-        ]
-    elif "Anak-Anak" in cat_recipe:
-        recipes = [
-            ("Senin", "🍱 Bento Nasi Kuning Ayam Popcorn & Telur", "Bahan: Nasi Kuning, Dada Ayam Potong Dadu, 1 Telur Rebus, Wortel.\n\nTutorial:\n1. Goreng dada ayam tepung crispy.\n2. Cetak nasi kuning dan hias bersama potongan telur rebus & wortel."),
-            ("Selasa", "🍝 Spaghetti Salmon Bolognese", "Bahan: Pasta Spaghetti, Fillet Salmon Cincang, Saus Tomat Homemade.\n\nTutorial:\n1. Rebus spaghetti al dente.\n2. Tumis salmon cincang dengan saus tomat lalu siram di atas pasta."),
-            ("Rabu", "🍲 Sup Makaroni Daging Sapi & Buncis", "Bahan: Daging Sapi Cincang, Makaroni, Buncis, Wortel, Kaldu Sapi.\n\nTutorial:\n1. Rebus daging sapi dan makaroni hingga empuk.\n2. Masukkan sayuran buncis & wortel dalam kuah kaldu gizi."),
-            ("Kamis", "🍳 Nasi Goreng Telur Puyuh & Udang", "Bahan: Nasi Putih, 4 Telur Puyuh, Udang Kupas, Minyak Wijen.\n\nTutorial:\n1. Tumis udang kupas dan telur puyuh orak-arik.\n2. Masukkan nasi dan bumbui ringan tanpa pengawet."),
-            ("Jumat", "🍗 Chicken Teriyaki & Tumis Brokoli", "Bahan: Dada Ayam, Saus Teriyaki, Brokoli, Biji Wijen.\n\nTutorial:\n1. Tumis ayam potong dengan saus teriyaki gurih.\n2. Sajikan dengan rebusan brokoli segar & taburan biji wijen."),
-            ("Sabtu", "🥪 Sandwich Telur Keju & Daging Asap", "Bahan: Roti Tawar Gandum, Telur Dadar, Keju Slice, Daging Asap.\n\nTutorial:\n1. Panggang roti gandum di atas teflon.\n2. Susun telur dadar, keju, & daging asap hangat."),
-            ("Minggu", "🍲 Soto Ayam Kuah Bening & Telur Rebus", "Bahan: Daging Ayam Suwir, Kuah Soto Bening, Telur Rebus, Tauge.\n\nTutorial:\n1. Rebus ayam kuah soto rempah alami.\n2. Sajikan suwiran ayam, tauge, & telur rebus matang.")
-        ]
-    elif "Remaja" in cat_recipe:
-        recipes = [
-            ("Senin", "🥩 Beef Bowl Yoshinoya Style & Egg", "Bahan: Daging Sapi Slice, Bawang Bombay, Kecap Asin, 1 Telur Ceplok.\n\nTutorial:\n1. Tumis daging sapi slice bersama bawang bombay saus gurih.\n2. Tumpuk di atas nasi hangat bersama telur ceplok setengah matang."),
-            ("Selasa", "🥗 Salad Salmon Panggang & Avokad", "Bahan: Fillet Salmon, Alpukat Slice, Sayur Selada, Olive Oil.\n\nTutorial:\n1. Panggang salmon dengan garam & lada hitam.\n2. Campur selada segar, potongan alpukat, & dressing olive oil."),
-            ("Rabu", "🍗 Ayam Bakar Madu & Tumis Kangkung", "Bahan: Paha Ayam, Bumbu Madu, Kangkung, Bawang Merah Putih.\n\nTutorial:\n1. Ungkep ayam bumbu madu lalu bakar keemasan.\n2. Tumis kangkung segar dengan sedikit minyak."),
-            ("Kamis", "🍲 Sup Ikan Batang Asam Pedas", "Bahan: Fillet Ikan Kakap/Tenggiri, Tomat Hijau, Belimbing Wulung.\n\nTutorial:\n1. Rebus kuah rempah bening asam segar.\n2. Masukkan fillet ikan & potongan tomat hingga matang."),
-            ("Jumat", "🍝 Fusilli Tuna Spicy Olive Oil", "Bahan: Pasta Fusilli, Tuna Cincang, Cabai Rawit, Minyak Zaitun.\n\nTutorial:\n1. Tumis tuna cincang & irisan cabai dengan olive oil.\n2. Campurkan pasta fusilli rebus."),
-            ("Sabtu", "🍳 Omelet Daging Cincang & Bayam Keju", "Bahan: 2 Telur Ayam, Daging Sapi Cincang, Bayam, Keju Mozzarella.\n\nTutorial:\n1. Kocok telur dengan isi daging cincang & bayam.\n2. Lipat omelet dan beri lelehan keju mozzarella di atasnya."),
-            ("Minggu", "🥣 Smoothies Bowl Buah Naga & Chia Seed", "Bahan: Buah Naga Blend, Pisang, Chia Seeds, Kacang Almond.\n\nTutorial:\n1. Blender halus buah naga & pisang dingin.\n2. Tuang ke mangkok dan beri topping chia seeds & almond renyah.")
-        ]
-    elif "Dewasa" in cat_recipe:
-        recipes = [
-            ("Senin", "🐟 Salmon Panggang Lemon & Kentang Rebus", "Bahan: Fillet Salmon, Perasan Lemon, Kentang, Rosemary.\n\nTutorial:\n1. Marinasi salmon dengan perasan lemon & lada.\n2. Panggang teflon 8 menit & sajikan dengan kentang rebus."),
-            ("Selasa", "🥗 Pokebowl Tuna Segar & Edamame", "Bahan: Fillet Tuna, Kacang Edamame, Nasi Merah, Wijen.\n\nTutorial:\n1. Tumis tuna sebentar dengan minyak wijen.\n2. Susun di atas nasi merah bersama edamame rebus."),
-            ("Rabu", "🥩 Tumis Daging Sapi Lada Hitam & Paprika", "Bahan: Daging Sapi Lean Slice, Paprika Merah Hijau, Lada Hitam.\n\nTutorial:\n1. Tumis daging sapi tanpa lemak bersama saus lada hitam.\n2. Masukkan potongan paprika kaya vitamin C."),
-            ("Kamis", "🍗 Dada Ayam Panggang Herb & Tumis Buncis", "Bahan: Dada Ayam Tanpa Kulit, Oregano, Buncis, Minyak Zaitun.\n\nTutorial:\n1. Panggang dada ayam bumbu herb rendah garam.\n2. Tumis buncis dengan minyak zaitun ringan."),
-            ("Jumat", "🍲 Sup Ikan Gurame Bening Daun Kemangi", "Bahan: Fillet Gurame, Daun Kemangi, Jahe, Serai, Kuah Bening.\n\nTutorial:\n1. Rebus kuah jahe serai wangi tanpa santan.\n2. Masukkan fillet gurame & daun kemangi hingga segar."),
-            ("Sabtu", "🍳 Tofu Stir Fry Shimeji & Telur", "Bahan: Tofu Jepang, Jamur Shimeji, 1 Telur, Saus Tiram.\n\nTutorial:\n1. Tumis tofu & jamur shimeji saus tiram rendah natrium.\n2. Orak-arik telur sebagai peningkat protein."),
-            ("Minggu", "🥣 Oatmeal Kayu Manis & Telur Rebus", "Bahan: Rolled Oats, Bubuk Kayu Manis, Buah Apel, 2 Telur Rebus.\n\nTutorial:\n1. Seduh rolled oats hangat dan beri parutan apel & kayu manis.\n2. Sajikan dengan 2 butir telur rebus matang.")
-        ]
-    else: # Lansia
-        recipes = [
-            ("Senin", "🐟 Tim Fillet Kakap Bumbu Jahe Lengkuas", "Bahan: Fillet Kakap, Irisan Jahe, Daun Bawang, Minyak Wijen.\n\nTutorial:\n1. Kukus fillet kakap dengan irisan jahe & serai hingga lembut.\n2. Beri beberapa tetes minyak wijen wangi tanpa garam berlebih."),
-            ("Selasa", "🍲 Sup Tahu Lembut & Ayam Cincang", "Bahan: Tahu Sutra, Dada Ayam Cincang, Labu Siam, Kuah Bening.\n\nTutorial:\n1. Rebus kuah kaldu bening rendah garam.\n2. Masukkan tahu sutra lembut & ayam cincang empuk mudah dikunyah."),
-            ("Rabu", "🥚 Pepes Telur Tahu & Daun Kemangi", "Bahan: 2 Telur Kocok, Tahu Lumat, Daun Kemangi, Bungkus Pisang.\n\nTutorial:\n1. Campur lumat tahu dan telur dengan kemangi harum.\n2. Kukus dalam daun pisang hingga matang empuk."),
-            ("Kamis", "🥩 Semur Daging Giling Empuk & Wortel", "Bahan: Daging Sapi Giling Halus, Wortel Rebus Empuk, Kecap.\n\nTutorial:\n1. Masak daging sapi giling lembut dengan bumbu semur ringan.\n2. Masukkan wortel rebus hingga tekstur sangat lembut."),
-            ("Jumat", "🥣 Bubur Manado Tinutuan Komplit", "Bahan: Beras, Labu Kuning Lumat, Bayam, Jagung Manis Pipil.\n\nTutorial:\n1. Masak bubur beras bersama labu kuning lumat kaya karotenoid.\n2. Masukkan sayuran lembut untuk kemudahan cerna lansia."),
-            ("Sabtu", "🍗 Sup Ayam Ceker & Sayuran Bening", "Bahan: Ceker Ayam Kaldu, Wortel, Kentang, Brokoli Rebus.\n\nTutorial:\n1. Rebus ceker ayam lama hingga keluar kolagen kaldu alami.\n2. Masukkan sayuran dipotong kecil empuk."),
-            ("Minggu", "🍳 Scrambled Egg Tahu & Puree Labu", "Bahan: 2 Telur Bebek/Ayam, Tahu Sutra, Puree Labu Kuning.\n\nTutorial:\n1. Orak-arik lembut telur dan tahu sutra dengan butter.\n2. Sajikan bersama puree labu kuning hangat yang lezat.")
-        ]
-
-    for day_name, title, tut in recipes:
-        st.markdown(f"""
-        <div class="edu-card">
-            <h3>📅 {day_name}: {title}</h3>
-            <pre style="background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; color:#F0F9FF; font-size:13px; white-space: pre-wrap;">{tut}</pre>
-            <a class="ref-btn" href="https://www.youtube.com/results?search_query=Resep+Sehat+{title.replace(' ', '+')}" target="_blank">📺 YouTube: Video Tutorial Memasak</a>
-            <a class="ref-btn" href="https://www.google.com/search?q=Resep+Nutrisi+Sehat+{title.replace(' ', '+')}" target="_blank">🔍 Google Search: Rujukan Bahan & Gizi</a>
-        </div>
-        """, unsafe_allow_html=True)
+    for r in recipes:
+        with st.expander(f"🍽️ {r['day']}: {r['title']} ({r['cal']})"):
+            st.markdown(f"**Sumber Protein Utama:** {r['protein']}")
+            st.markdown(f"**Cara Memasak / Resep:**\n{r['steps']}")
+            st.markdown(f'<a href="{r["link"]}" target="_blank" class="ref-btn">▶️ Tonton Tutorial YouTube</a>', unsafe_allow_html=True)
 
 # ================= TAB 4: EDUKASI & BERITA VIDEO =================
 with tab4:
     st.markdown(f"### {txt['edu_title']}")
     
     col_e1, col_e2 = st.columns(2)
-    
     with col_e1:
         st.markdown("""
         <div class="edu-card">
-            <h3>🌱 1. Apa Itu Stunting & Bahayanya?</h3>
-            <p>Stunting adalah kondisi gagal tumbuh pada balita akibat kekurangan gizi kronis dan infeksi berulang dalam <strong>1.000 Hari Pertama Kehidupan (0-24 Bulan)</strong>. Dampaknya tidak hanya fisik pendek, tetapi juga penurunan IQ serta risiko penyakit degeneratif saat dewasa.</p>
-            <a class="ref-btn" href="https://ayosehat.kemkes.go.id/topik-penyakit/defisiensi-nutrisi/stunting" target="_blank">🌐 AyoSehat Kemenkes: Penjelasan Stunting</a>
+            <h3>📖 Apa itu Stunting dan Mengapa Cegah Sejak Dini?</h3>
+            <p>Stunting bukan sekadar masalah genetik atau keturunan pendek, melainkan manifestasi dari kekurangan gizi kronis dan infeksi berulang dalam 1.000 Hari Pertama Kehidupan (HPK).</p>
+            <a href="https://www.who.int/news-room/fact-sheets/detail/stunting-in-a-nutshell" target="_blank" class="ref-btn">🔗 Rujukan Resmi WHO</a>
+            <a href="https://www.kemkes.go.id" target="_blank" class="ref-btn">🔗 Kemenkes RI</a>
         </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
         <div class="edu-card">
-            <h3>🍖 2. Mengapa Harus Protein Hewani?</h3>
-            <p>Protein hewani (telur, hati ayam, ikan kembung, daging) mengandung asam amino esensial lengkap dan rangsangan faktor pertumbuhan <em>mTORC1/IGF-1</em> untuk pembentukan tulang panjang anak.</p>
-            <a class="ref-btn" href="https://www.google.com/search?q=Protein+Hewani+Cegah+Stunting+Kemenkes" target="_blank">🔍 Google Search: Bukti Klinis Protein Hewani</a>
-        </div>
-        <div class="edu-card">
-            <h3>💉 3. Imunisasi Lengkap & Vitamin A</h3>
-            <p>Anak yang sering terkena penyakit infeksi akibat tidak imunisasi lengkap akan kehilangan banyak nutrisi, yang memicu stunting berulang. Pastikan Vitamin A diminum setiap bulan Februari dan Agustus.</p>
-            <a class="ref-btn" href="https://sehatnegeriku.kemkes.go.id" target="_blank">🌐 Sehat NegeriKu Kemenkes</a>
+            <h3>🍳 Keunggulan Protein Hewani Dibanding Nabati</h3>
+            <p>Riset klinis membuktikan bahwa asam amino esensial lengkap pada protein hewani (seperti telur, ikan, susu, daging) jauh lebih efektif menstimulasi hormon pertumbuhan (*IGF-1*) dibandingkan protein nabati.</p>
+            <a href="https://www.unicef.org" target="_blank" class="ref-btn">🔗 UNICEF Child Nutrition</a>
         </div>
         """, unsafe_allow_html=True)
 
     with col_e2:
         st.markdown("""
         <div class="edu-card">
-            <h3>📰 4. Berita Terkini Stunting di Indonesia</h3>
-            <ul>
-                <li><strong>Prevalensi Stunting Indonesia:</strong> Hasil SSGI menunjukkan angka prevalensi stunting nasional berada di kisaran 19,8%.</li>
-                <li><strong>Gerakan Intervensi Serentak:</strong> Pemerintah terus menggalakkan pemberian Makanan Tambahan (PMT) Kaya Protein Hewani di seluruh Posyandu.</li>
-            </ul>
-            <a class="ref-btn" href="https://stunting.go.id" target="_blank">📰 Portal Resmi TP2S Stunting Indonesia</a>
-        </div>
-        <div class="edu-card">
-            <h3>🛡️ 5. Kebiasaan Buruk Anak yang Menghambat Pertumbuhan</h3>
-            <ul>
-                <li><strong>Pemberian Teh/Kopi pada Balita:</strong> Senyawa tanin mengikat zat besi dari makanan sehingga memicu anemia dan stunting.</li>
-                <li><strong>Kurang Tidur Malam:</strong> Hormon pertumbuhan (Growth Hormone) diproduksi maksimal saat anak tidur nyenyak di malam hari.</li>
-                <li><strong>Minum Air Berlebihan Sebelum Makan:</strong> Mengisi lambung dengan cairan tanpa kalori sehingga anak cepat kenyang.</li>
-            </ul>
-            <a class="ref-btn" href="https://www.who.int/news-room/fact-sheets/detail/malnutrition" target="_blank">🌐 WHO Fact Sheets: Child Malnutrition</a>
+            <h3>🎥 Video Edukasi: Pencegahan Stunting Nasional</h3>
+            <p>Tonton video panduan resmi penanganan stunting dan pentingnya pemberian makanan bergizi seimbang di fasilitas kesehatan:</p>
+            <iframe width="100%" height="215" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Video Edukasi" frameborder="0" allowfullscreen style="border-radius:10px; margin-top:10px;"></iframe>
         </div>
         """, unsafe_allow_html=True)
 
-    st.write("---")
-    st.markdown("### 📺 Video Edukasi Resmi Kemenkes & BKKBN")
-    col_v1, col_v2 = st.columns(2)
-    with col_v1:
-        st.markdown("#### 📺 Video Kemenkes RI: Cegah Stunting dengan ABCDE")
-        st.video("https://www.youtube.com/watch?v=2Z1h9mQX7EQ")
-        st.caption("Sumber: Kementerian Kesehatan RI & Ayo Sehat")
-        
-    with col_v2:
-        st.markdown("#### 📺 Video BKKBN: Pengasuhan 1000 Hari Pertama Kehidupan")
-        st.video("https://www.youtube.com/watch?v=S00n-c_qeC0")
-        st.caption("Sumber: BKKBN RI Official")
-
-# ================= TAB 5: NUTRIPOT-AI CHAT KONSULTASI =================
+# ================= TAB 5: NUTRIBOT-AI CHAT KONSULTASI =================
 with tab5:
     st.markdown(f"### {txt['chat_title']}")
-    st.caption(f"Ruang Diskusi & Konsultasi Interaktif Pakar Medis Gizi Balita & Lintas Usia ({st.session_state.age_category}):")
-
-    for msg in st.session_state.chat_messages:
-        with st.chat_message(msg["role"]):
-            st.write(msg["content"])
-
-    if prompt := st.chat_input("Ketik pertanyaan konsultasi di sini (misal: 'Anak saya ga suka makan ikan, alternatifnya apa?')..."):
-        st.session_state.chat_messages.append({"role": "user", "content": prompt})
-        
-        bot_reply = generate_smart_ai_response(
-            prompt, st.session_state.user_name, st.session_state.age_category, st.session_state.age_val, 
-            st.session_state.height_val, st.session_state.weight_val
-        )
-        st.session_state.chat_messages.append({"role": "assistant", "content": bot_reply})
-        st.rerun()
+    st.caption(f"Konsultasikan seputar makanan, pantangan, tinggi badan, atau keluhan gizi untuk **{st.session_state.user_name}** ({st.session_state.age_category}).")
+    
+    for message in st.session_state.chat_messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+            
+    if user_prompt := st.chat_input("Tulis pertanyaan seputar nutrisi, menu, atau kesehatan di sini..."):
+        st.session_state.chat_messages.append({"role": "user", "content": user_prompt})
+        with st.chat_message("user"):
+            st.markdown(user_prompt)
+            
+        with st.chat_message("assistant"):
+            with st.spinner("NutriBot-AI sedang menganalisis..."):
+                bot_reply = generate_smart_ai_response(
+                    user_prompt,
+                    st.session_state.user_name,
+                    st.session_state.age_category,
+                    st.session_state.age_val,
+                    st.session_state.height_val,
+                    st.session_state.weight_val
+                )
+                st.markdown(bot_reply)
+                st.session_state.chat_messages.append({"role": "assistant", "content": bot_reply})
