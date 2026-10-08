@@ -13,12 +13,12 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Styling CSS Modern dengan Background Gambar Pinterest Terbaru
+# 2. Styling CSS Modern dengan Biru Muda Transparan (Glassmorphism)
 st.markdown("""
 <style>
     /* Background Animasi Anak-Anak dari Pinterest Terbaru */
     .stApp {
-        background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), 
+        background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.75)), 
                     url('https://i.pinimg.com/736x/e9/67/8d/e9678dd9f3233a7528d3e9e3310bbed8.jpg');
         background-size: cover;
         background-position: center;
@@ -26,19 +26,24 @@ st.markdown("""
         background-attachment: fixed;
     }
     
+    /* Header Utama: Biru Muda Transparan dengan Efek Blur */
     .main-header {
         text-align: center;
         padding: 25px 20px;
-        background: linear-gradient(135deg, #FF758C 0%, #FF7EB3 100%);
+        background: rgba(56, 189, 248, 0.25);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(56, 189, 248, 0.4);
         border-radius: 20px;
-        color: white;
-        box-shadow: 0 10px 25px rgba(255, 117, 140, 0.4);
+        color: #F0F9FF;
+        box-shadow: 0 10px 30px rgba(14, 165, 233, 0.25);
         margin-bottom: 25px;
     }
     .main-header h1 {
         font-size: 2.5rem;
         font-weight: 800;
         margin-bottom: 5px;
+        color: #38BDF8;
     }
     .edu-card {
         background: rgba(30, 41, 59, 0.85);
@@ -51,7 +56,7 @@ st.markdown("""
         color: #F8FAFC;
     }
     .edu-card h3 {
-        color: #FF758C;
+        color: #38BDF8;
         margin-bottom: 10px;
     }
     .report-box {
@@ -59,19 +64,21 @@ st.markdown("""
         color: #1E293B;
         padding: 25px;
         border-radius: 15px;
-        border-left: 8px solid #FF512F;
+        border-left: 8px solid #0284C7;
         margin-top: 20px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
+    
+    /* Tombol Utama: Gradient Biru Cyan */
     div.stButton > button:first-child {
-        background: linear-gradient(45deg, #FF512F, #DD2476);
+        background: linear-gradient(135deg, #0EA5E9, #38BDF8);
         color: white;
         font-weight: 800;
         font-size: 16px;
         border-radius: 50px;
         padding: 12px 25px;
         border: none;
-        box-shadow: 0 4px 15px rgba(221, 36, 118, 0.4);
+        box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
         width: 100%;
         text-transform: uppercase;
     }
@@ -192,7 +199,7 @@ with tab1:
 
         st.markdown(f"""
         <div class="report-box">
-            <h3 style="color: #DD2476; margin-top:0;">📋 Kartu Hasil Analisis & Rujukan Orang Tua</h3>
+            <h3 style="color: #0284C7; margin-top:0;">📋 Kartu Hasil Analisis & Rujukan Orang Tua</h3>
             <p><strong>Subjek Evaluasi:</strong> Balita Usia {age} Bulan ({gender})</p>
             <p><strong>Status Ringkas:</strong> {"Perlu Penanganan & Intervensi Gizi Intensif" if prediction == 1 else "Pertumbuhan Sesuai Usia, Pertahankan Nutrisi"}</p>
             <hr>
