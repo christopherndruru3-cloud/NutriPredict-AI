@@ -374,7 +374,7 @@ def generate_smart_ai_response(prompt, user_name, age_cat, age, height, weight):
     elif any(k in p for k in ["resep", "menu", "masak", "makanan apa", "mpasi"]):
         return f"Panduan menu nutrisi 7 hari terlengkap untuk kelompok usia **{age_cat}** sudah disediakan secara lengkap di **Tab 🥣 Resep Nutrisi 7 Hari**, lengkap dengan bahan, cara memasak, dan link tutorial videonya!"
 
-    # 9. Default Cerdas Kontekstual Lintas Pertanyaan Prediktif (Menampung Ratusan Variasi Lain)
+    # 9. Default Cerdas Kontekstual Lintas Pertanyaan Prediktif
     else:
         return f"Terima kasih atas pertanyaannya mengenai **{user_name}** ({age_cat})! Berdasarkan standar gizi dan kesehatan medis: Pastikan kecukupan gizi seimbang kaya Protein Hewani, penuhi hidrasi air putih, hindari jajanan tinggi gula/garam, serta pantau secara teratur grafik antropometri di aplikasi ini. Ada hal spesifik lain tentang menu, tinggi badan, atau keluhan kesehatan yang ingin didiskusikan?"
 
@@ -665,7 +665,7 @@ with tab2:
     sc2.metric("Proyeksi Tinggi Badan", f"{projected_height:.1f} cm", delta=f"+{sim_months * 0.75:.1f} cm")
     sc3.metric("Proyeksi Berat Badan", f"{projected_weight:.1f} kg", delta=f"+{sim_months * 0.25:.1f} kg")
 
-# ================= TAB 3: RESEP NUTRISI 7 HARI =================
+# ================= TAB 3: RESEP NUTRISI 7 HARI (DIKEMBALIKAN UTUH) =================
 with tab3:
     st.markdown(f"### {txt['recipe_title']}")
     st.caption("Menu lengkap kaya Protein Hewani untuk mencegah dan mengatasi stunting, lengkap dengan cara memasak serta video tutorial resmi.")
@@ -686,7 +686,7 @@ with tab3:
             st.markdown(f"**Cara Memasak / Resep:**\n{r['steps']}")
             st.markdown(f'<a href="{r["link"]}" target="_blank" class="ref-btn">▶️ Tonton Tutorial YouTube</a>', unsafe_allow_html=True)
 
-# ================= TAB 4: EDUKASI & BERITA VIDEO =================
+# ================= TAB 4: EDUKASI & BERITA VIDEO (DIKEMBALIKAN UTUH) =================
 with tab4:
     st.markdown(f"### {txt['edu_title']}")
     
