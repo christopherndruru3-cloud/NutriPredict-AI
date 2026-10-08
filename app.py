@@ -157,7 +157,7 @@ if st.session_state.logged_in:
         st.rerun()
 
 # ---------------------------------------------------------
-# 4. STYLING CSS ANIMATIF
+# 4. STYLING CSS ANIMATIF & CARD RESEP
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -212,19 +212,51 @@ st.markdown("""
         color: #38BDF8;
         margin-bottom: 10px;
     }
+
+    /* Styling Recipe Card Grid Animatif */
+    .recipe-card {
+        background: rgba(30, 41, 59, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        color: #F8FAFC;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+        transition: all 0.3s ease-in-out;
+        height: 100%;
+    }
+    .recipe-card:hover {
+        transform: translateY(-6px);
+        border-color: #38BDF8;
+        box-shadow: 0 12px 35px rgba(56, 189, 248, 0.25);
+    }
+    .recipe-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #0EA5E9, #0284C7);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
     
     .ref-btn {
         display: inline-block;
         background-color: #0284C7;
         color: white !important;
-        padding: 4px 12px;
+        padding: 6px 14px;
         border-radius: 20px;
-        font-size: 11px;
+        font-size: 12px;
         font-weight: bold;
         text-decoration: none;
-        margin-top: 8px;
-        margin-right: 5px;
+        margin-top: 12px;
         box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+        transition: background 0.2s;
+    }
+    .ref-btn:hover {
+        background-color: #0EA5E9;
     }
 
     .report-box {
@@ -341,7 +373,7 @@ def generate_dynamic_action_plan(age_cat, age, height, weight, z_score, who_stat
     return actions
 
 # ---------------------------------------------------------
-# 6. NUTRIBOT-AI CHATBOT ENGINE (DENGAN 1000 PREDIKSI VARIASI PERTANYAAN)
+# 6. NUTRIBOT-AI CHATBOT ENGINE
 # ---------------------------------------------------------
 def generate_smart_ai_response(prompt, user_name, age_cat, age, height, weight):
     p = prompt.lower()
@@ -375,7 +407,7 @@ def generate_smart_ai_response(prompt, user_name, age_cat, age, height, weight):
         return f"Untuk mengoptimalkan tinggi badan **{user_name}** ({height} cm):\n1. Pastikan asupan **Protein Hewani** tercukupi setiap hari guna memicu hormon *IGF-1* pembentuk tulang.\n2. Tidur nyenyak malam hari (jam 22.00 - 02.00) karena *Growth Hormone* diproduksi maksimal saat *deep sleep*.\n3. Lakukan aktivitas fisik atau olahraga peregangan secara rutin."
 
     elif any(k in p for k in ["berat", "bb", "kurus", "gemuk", "diet", "turun berat", "naik berat"]):
-        return f"Pengaturan berat badan untuk **{user_name}** ({weight} kg) harus berpatokan pada IMT:\n- **Untuk Naik BB:** Tambahkan booster lemak sehat (santan, alpukat, keju, mentega) dan protein tinggi.\n- **For Turun BB:** Batasi gula, gorengan, makanan instan, serta perbanyak serat dan aktivitas fisik."
+        return f"Pengaturan berat badan untuk **{user_name}** ({weight} kg) harus berpatokan pada IMT:\n- **Untuk Naik BB:** Tambahkan booster lemak sehat (santan, alpukat, keju, mentega) dan protein tinggi.\n- **Untuk Turun BB:** Batasi gula, gorengan, makanan instan, serta perbanyak serat dan aktivitas fisik."
 
     elif any(k in p for k in ["diare", "mencret", "pencernaan", "perut"]):
         return f"Infeksi pencernaan berulang seperti diare dapat menyebabkan anak kehilangan nutrisi drastis (*malabsorpsi*). Berikan cairan rehidrasi (Oralit), zinc sesuai dosis dokter, serta tetap lanjutkan makanan lunak padat gizi untuk **{user_name}**."
@@ -679,91 +711,102 @@ with tab2:
     sc2.metric("Proyeksi Tinggi Badan", f"{projected_height:.1f} cm", delta=f"+{sim_months * 0.75:.1f} cm")
     sc3.metric("Proyeksi Berat Badan", f"{projected_weight:.1f} kg", delta=f"+{sim_months * 0.25:.1f} kg")
 
-# ================= TAB 3: RESEP NUTRISI 7 HARI (LENGKAP SEMUA UMUR) =================
+# ================= TAB 3: RESEP NUTRISI 7 HARI (BENTUK CARD GRID ANIMATIF TANPA TEKAN-TEKAN) =================
 with tab3:
     st.markdown(f"### {txt['recipe_title']}")
-    st.caption("Pilih kelompok usia untuk melihat panduan menu nutrisi 7 hari lengkap dengan bahan, cara memasak, dan link tutorial video.")
+    st.caption("Pilih kelompok usia di bawah ini untuk langsung melihat deretan card menu nutrisi 7 hari secara lengkap & animatif.")
     
     cat_recipe = st.radio("Pilih Kelompok Usia Resep / Select Recipe Category:", 
                           ["Balita (6-8 Bulan)", "Balita (9-11 Bulan)", "Balita (12-23 Bulan)", "Anak-Anak (5-12 Tahun)", "Remaja (13-18 Tahun)", "Dewasa (19-59 Tahun)", "Lansia (60+ Tahun)"], horizontal=True)
     
     if "6-8" in cat_recipe:
         recipes = [
-            ("Senin", "🐣 Puree Hati Ayam & Santan", "Bahan: 30g Hati Ayam, 2 sdm Nasi, 1 sdt Santan, Wortel.\n\nTutorial:\n1. Rebus hati ayam & wortel hingga matang empuk.\n2. Lumatkan nasi hangat bersama parutan wortel.\n3. Tambahkan 1 sdt santan segar hangat lalu saring halus dengan saringan kawat.", "https://www.youtube.com/results?search_query=resep+mpasi+hati+ayam+santan"),
-            ("Selasa", "🐟 Puree Ikan Kembung & Labu Siam", "Bahan: 30g Fillet Ikan Kembung, 2 sdm Nasi, Labu Siam, 1 sdt Minyak Kelapa.\n\nTutorial:\n1. Kukus fillet ikan kembung tanpa duri dan parutan labu siam.\n2. Campurkan dengan nasi tim hangat.\n3. Tambahkan 1 sdt minyak kelapa lalu saring lumat.", "https://www.youtube.com/results?search_query=resep+mpasi+ikan+kembung"),
-            ("Rabu", "🥚 Puree Telur Puyuh & Bayam", "Bahan: 2 Butir Telur Puyuh, 2 sdm Nasi, Daun Bayam, Sejumput Butter.\n\nTutorial:\n1. Rebus telur puyuh hingga matang keras lalu lumatkan kuning & putihnya.\n2. Cincang halus daun bayam rebus.\n3. Aduk rata bersama nasi lembik dan butter.", "https://www.youtube.com/results?search_query=resep+mpasi+telur+puyuh+bayam"),
-            ("Kamis", "🥩 Puree Daging Sapi & Kentang", "Bahan: 30g Daging Sapi Cincang, 1/2 Kentang Rebus, Keju Parut.\n\nTutorial:\n1. Tumis daging sapi cincang halus hingga matang.\n2. Rebus kentang lalu lumatkan bersama daging sapi.\n3. Taburi keju parut secukupnya.", "https://www.youtube.com/results?search_query=resep+mpasi+daging+sapi+kentang"),
-            ("Jumat", "🦐 Puree Udang & Tahu Lembut", "Bahan: 30g Udang Cincang, 1/2 Tahu Putih, 2 sdm Nasi, Minyak Wijen.\n\nTutorial:\n1. Cincang halus udang kupas bersih.\n2. Lumatkan tahu putih bersama nasi lembik.\n3. Kukus selama 15 menit dan beri 2 tetes minyak wijen.", "https://www.youtube.com/results?search_query=resep+mpasi+udang+tahu"),
-            ("Sabtu", "🍳 Puree Telur Bebek & Tempe", "Bahan: 1/2 Telur Bebek, 1 Potong Tempe, 2 sdm Nasi, Margarin.\n\nTutorial:\n1. Kukus tempe hingga empuk.\n2. Orak-arik telur bebek dengan margarin.\n3. Lumatkan halus tempe, telur, dan nasi hangat.", "https://www.youtube.com/results?search_query=resep+mpasi+telur+bebek+tempe"),
-            ("Minggu", "🍲 Puree Ayam & Kaldu Ceker", "Bahan: 30g Daging Ayam Cincang, Wortel, Kuah Kaldu Ceker, Nasi.\n\nTutorial:\n1. Rebus daging ayam dan wortel dalam kuah kaldu ceker alami.\n2. Lumatkan nasi hangat bersama rebusan ayam hingga tekstur puree lembut.", "https://www.youtube.com/results?search_query=resep+mpasi+ayam+kaldu+ceker")
+            ("Senin", "🐣 Puree Hati Ayam & Santan", "Bahan: 30g Hati Ayam, 2 sdm Nasi, 1 sdt Santan, Wortel.\n\nCara Memasak:\n1. Rebus hati ayam & wortel hingga matang empuk.\n2. Lumatkan nasi hangat bersama parutan wortel.\n3. Tambahkan 1 sdt santan segar hangat lalu saring halus.", "https://www.youtube.com/results?search_query=resep+mpasi+hati+ayam+santan"),
+            ("Selasa", "🐟 Puree Ikan Kembung & Labu Siam", "Bahan: 30g Fillet Ikan Kembung, 2 sdm Nasi, Labu Siam, Minyak Kelapa.\n\nCara Memasak:\n1. Kukus fillet ikan kembung tanpa duri & labu siam.\n2. Campurkan dengan nasi tim hangat.\n3. Tambahkan 1 sdt minyak kelapa lalu saring lumat.", "https://www.youtube.com/results?search_query=resep+mpasi+ikan+kembung"),
+            ("Rabu", "🥚 Puree Telur Puyuh & Bayam", "Bahan: 2 Telur Puyuh, 2 sdm Nasi, Daun Bayam, Butter.\n\nCara Memasak:\n1. Rebus telur puyuh hingga matang keras lalu lumatkan.\n2. Cincang halus daun bayam rebus.\n3. Aduk rata bersama nasi lembik dan butter.", "https://www.youtube.com/results?search_query=resep+mpasi+telur+puyuh+bayam"),
+            ("Kamis", "🥩 Puree Daging Sapi & Kentang", "Bahan: 30g Daging Sapi Cincang, 1/2 Kentang Rebus, Keju Parut.\n\nCara Memasak:\n1. Tumis daging sapi cincang halus hingga matang.\n2. Rebus kentang lalu lumatkan bersama daging.\n3. Taburi keju parut secukupnya.", "https://www.youtube.com/results?search_query=resep+mpasi+daging+sapi+kentang"),
+            ("Jumat", "🦐 Puree Udang & Tahu Lembut", "Bahan: 30g Udang Cincang, Tahu Putih, Nasi, Minyak Wijen.\n\nCara Memasak:\n1. Cincang halus udang kupas bersih.\n2. Lumatkan tahu putih bersama nasi lembik.\n3. Kukus 15 menit & beri 2 tetes minyak wijen.", "https://www.youtube.com/results?search_query=resep+mpasi+udang+tahu"),
+            ("Sabtu", "🍳 Puree Telur Bebek & Tempe", "Bahan: 1/2 Telur Bebek, 1 Potong Tempe, Nasi, Margarin.\n\nCara Memasak:\n1. Kukus tempe hingga empuk.\n2. Orak-arik telur bebek dengan margarin.\n3. Lumatkan halus tempe, telur, dan nasi hangat.", "https://www.youtube.com/results?search_query=resep+mpasi+telur+bebek+tempe"),
+            ("Minggu", "🍲 Puree Ayam & Kaldu Ceker", "Bahan: 30g Daging Ayam, Wortel, Kaldu Ceker, Nasi.\n\nCara Memasak:\n1. Rebus daging ayam & wortel dalam kaldu ceker alami.\n2. Lumatkan nasi hangat bersama rebusan ayam.", "https://www.youtube.com/results?search_query=resep+mpasi+ayam+kaldu+ceker")
         ]
     elif "9-11" in cat_recipe:
         recipes = [
-            ("Senin", "🌾 Tim Nasi Hati Ayam Cincang", "Bahan: 40g Hati Ayam, 3 sdm Nasi Tim, Buncis Cincang, Margarin.\n\nTutorial:\n1. Tumis hati ayam cincang dengan margarin.\n2. Masukkan nasi tim & potongan buncis halus.\n3. Masak hingga bumbu meresap.", "https://www.youtube.com/results?search_query=resep+nasi+tim+hati+ayam"),
-            ("Selasa", "🐟 Tim Ikan Kembung Suwir & Kelor", "Bahan: 40g Ikan Kembung, Daun Kelor Cincang, Nasi Tim, Minyak Kelapa.\n\nTutorial:\n1. Suwir halus ikan kembung kukus tanpa duri.\n2. Masukkan ke nasi tim bersama daun kelor cincang halus.", "https://www.youtube.com/results?search_query=resep+nasi+tim+ikan+kembung"),
-            ("Rabu", "🥚 Tim Nasi Telur Bebek & Jagung", "Bahan: 1 Telur Bebek, Jagung Manis Pipil, Nasi Tim, Margarin.\n\nTutorial:\n1. Orak-arik telur bebek dengan margarin.\n2. Campurkan dengan nasi tim & pipilan jagung manis lumat.", "https://www.youtube.com/results?search_query=resep+nasi+tim+telur+jagung"),
-            ("Kamis", "🥩 Tim Daging Sapi Cincang & Brokoli", "Bahan: 40g Daging Sapi Cincang, Brokoli Cincang, Nasi Tim, Bawang Putih.\n\nTutorial:\n1. Tumis daging sapi cincang & bawang putih harum.\n2. Masukkan nasi tim & cincangan brokoli hingga matang.", "https://www.youtube.com/results?search_query=resep+nasi+tim+daging+brokoli"),
-            ("Jumat", "🦐 Tim Udang Cincang & Tahu Dadu", "Bahan: 40g Udang Cincang, Tahu Dadu Kecil, Nasi Tim, Minyak Wijen.\n\nTutorial:\n1. Tumis udang cincang dengan sedikit minyak wijen.\n2. Masukkan tahu dadu kecil & nasi tim hangat.", "https://www.youtube.com/results?search_query=resep+nasi+tim+udang+tahu"),
-            ("Sabtu", "🍳 Tim Telur Puyuh & Sup Wortel", "Bahan: 3 Butir Telur Puyuh, Wortel Dadu, Nasi Tim, Kuah Ayam.\n\nTutorial:\n1. Rebus 3 telur puyuh.\n2. Sajikan bersama nasi tim & sup wortel potong dadu kecil.", "https://www.youtube.com/results?search_query=resep+nasi+tim+telur+puyuh"),
-            ("Minggu", "🍲 Tim Bola-Bola Ayam & Labu", "Bahan: 40g Ayam Cincang, Labu Siam Dadu, Nasi Tim, Kaldu.\n\nTutorial:\n1. Buat adonan bola ayam cincang kecil.\n2. Rebus dalam kuah kaldu bersama labu siam hingga matang.", "https://www.youtube.com/results?search_query=resep+nasi+tim+bola+ayam")
+            ("Senin", "🌾 Tim Nasi Hati Ayam Cincang", "Bahan: 40g Hati Ayam, 3 sdm Nasi Tim, Buncis Cincang, Margarin.\n\nCara Memasak:\n1. Tumis hati ayam cincang dengan margarin.\n2. Masukkan nasi tim & potongan buncis halus.\n3. Masak hingga bumbu meresap.", "https://www.youtube.com/results?search_query=resep+nasi+tim+hati+ayam"),
+            ("Selasa", "🐟 Tim Ikan Kembung Suwir & Kelor", "Bahan: 40g Ikan Kembung, Daun Kelor Cincang, Nasi Tim.\n\nCara Memasak:\n1. Suwir halus ikan kembung kukus tanpa duri.\n2. Masukkan ke nasi tim bersama daun kelor cincang halus.", "https://www.youtube.com/results?search_query=resep+nasi+tim+ikan+kembung"),
+            ("Rabu", "🥚 Tim Nasi Telur Bebek & Jagung", "Bahan: 1 Telur Bebek, Jagung Manis Pipil, Nasi Tim, Margarin.\n\nCara Memasak:\n1. Orak-arik telur bebek dengan margarin.\n2. Campurkan dengan nasi tim & pipilan jagung lumat.", "https://www.youtube.com/results?search_query=resep+nasi+tim+telur+jagung"),
+            ("Kamis", "🥩 Tim Daging Sapi Cincang & Brokoli", "Bahan: 40g Daging Sapi, Brokoli Cincang, Nasi Tim, Bawang Putih.\n\nCara Memasak:\n1. Tumis daging sapi cincang & bawang putih harum.\n2. Masukkan nasi tim & cincangan brokoli hingga matang.", "https://www.youtube.com/results?search_query=resep+nasi+tim+daging+brokoli"),
+            ("Jumat", "🦐 Tim Udang Cincang & Tahu Dadu", "Bahan: 40g Udang, Tahu Dadu, Nasi Tim, Minyak Wijen.\n\nCara Memasak:\n1. Tumis udang cincang dengan sedikit minyak wijen.\n2. Masukkan tahu dadu kecil & nasi tim hangat.", "https://www.youtube.com/results?search_query=resep+nasi+tim+udang+tahu"),
+            ("Sabtu", "🍳 Tim Telur Puyuh & Sup Wortel", "Bahan: 3 Telur Puyuh, Wortel Dadu, Nasi Tim, Kuah Ayam.\n\nCara Memasak:\n1. Rebus 3 telur puyuh.\n2. Sajikan bersama nasi tim & sup wortel potong dadu.", "https://www.youtube.com/results?search_query=resep+nasi+tim+telur+puyuh"),
+            ("Minggu", "🍲 Tim Bola-Bola Ayam & Labu", "Bahan: 40g Ayam Cincang, Labu Siam, Nasi Tim, Kaldu.\n\nCara Memasak:\n1. Buat adonan bola ayam cincang kecil.\n2. Rebus dalam kuah kaldu bersama labu siam hingga matang.", "https://www.youtube.com/results?search_query=resep+nasi+tim+bola+ayam")
         ]
     elif "12-23" in cat_recipe:
         recipes = [
-            ("Senin", "🍲 Sup Bola Bakso Ayam Udang", "Bahan: 50g Daging Ayam & Udang, Wortel, Kentang, Kuah Kaldu.\n\nTutorial:\n1. Buat bakso ayam udang homemade.\n2. Rebus dalam kuah kaldu wortel & kentang hingga mengapung matang.", "https://www.youtube.com/results?search_query=resep+sup+bakso+ayam+udang+anak"),
-            ("Selasa", "🐟 Pepes Ikan Lele / Belut Tanpa Duri", "Bahan: 50g Lele/Belut, Bumbu Kuning Lembut, Daun Pisang.\n\nTutorial:\n1. Bumbui lele/belut tanpa duri dengan bumbu harum.\n2. Kukus dalam bungkus daun pisang selama 20 menit.", "https://www.youtube.com/results?search_query=resep+pepes+lele+tanpa+duri+anak"),
-            ("Rabu", "🥩 Semur Daging Cincang & Telur Puyuh", "Bahan: 50g Daging Sapi Cincang, 3 Telur Puyuh, Kecap Manis, Bawang.\n\nTutorial:\n1. Tumis daging sapi cincang kecap manis harum.\n2. Masukkan 3 butir telur puyuh rebus hingga bumbu meresap.", "https://www.youtube.com/results?search_query=resep+semur+daging+cincang+balita"),
-            ("Kamis", "🍗 Ayam Goreng Kaldu & Sayur Bening", "Bahan: 1 Potong Ayam Ungkep Kaldu, Bayam, Nasi Warm.\n\nTutorial:\n1. Ungkep ayam dengan kaldu alami lalu goreng sebentar.\n2. Sajikan dengan sayur bening bayam & nasi hangat.", "https://www.youtube.com/results?search_query=resep+ayam+goreng+kaldu+sayur+bayam"),
-            ("Jumat", "🦐 Tumis Udang Brokoli Saus Mentega", "Bahan: 50g Udang Kupas, Brokoli, Mentega, Kecap Manis.\n\nTutorial:\n1. Tumis udang kupas & brokoli dengan mentega harum.\n2. Beri sedikit kecap manis.", "https://www.youtube.com/results?search_query=resep+udang+brokoli+mentega+anak"),
-            ("Sabtu", "🍳 Telur Dadar Daun Kelor & Nasi Warm", "Bahan: 1 Butir Telur Ayam, Daun Kelor Cincang, Margarin.\n\nTutorial:\n1. Kocok 1 butir telur dengan daun kelor cincang.\n2. Dadar tipis dengan margarin dan sajikan bersama nasi hangat.", "https://www.youtube.com/results?search_query=resep+telur+dadar+daun+kelor"),
-            ("Minggu", "🥞 Pancake Hati Ayam & Pisang", "Bahan: Tepung Terigu, Pisang Lumat, 1 Telur, Bubuk Hati Ayam Sangrai.\n\nTutorial:\n1. Campurkan tepung terigu, pisang lumat, telur, & bubuk hati ayam sangrai.\n2. Panggang di teflon dengan api kecil hingga matang keemasan.", "https://www.youtube.com/results?search_query=resep+pancake+hati+ayam+pisang")
+            ("Senin", "🍲 Sup Bola Bakso Ayam Udang", "Bahan: 50g Ayam & Udang, Wortel, Kentang, Kuah Kaldu.\n\nCara Memasak:\n1. Buat bakso ayam udang homemade.\n2. Rebus dalam kuah kaldu wortel & kentang hingga matang.", "https://www.youtube.com/results?search_query=resep+sup+bakso+ayam+udang+anak"),
+            ("Selasa", "🐟 Pepes Ikan Lele Tanpa Duri", "Bahan: 50g Lele, Bumbu Kuning Lembut, Daun Pisang.\n\nCara Memasak:\n1. Bumbui lele tanpa duri dengan bumbu harum.\n2. Kukus dalam bungkus daun pisang selama 20 menit.", "https://www.youtube.com/results?search_query=resep+pepes+lele+tanpa+duri+anak"),
+            ("Rabu", "🥩 Semur Daging & Telur Puyuh", "Bahan: 50g Daging Cincang, 3 Telur Puyuh, Kecap Manis.\n\nCara Memasak:\n1. Tumis daging sapi cincang kecap manis harum.\n2. Masukkan 3 telur puyuh rebus hingga meresap.", "https://www.youtube.com/results?search_query=resep+semur+daging+cincang+balita"),
+            ("Kamis", "🍗 Ayam Goreng Kaldu & Sayur Bening", "Bahan: 1 Potong Ayam Ungkep, Bayam, Nasi Hangat.\n\nCara Memasak:\n1. Ungkep ayam dengan kaldu lalu goreng sebentar.\n2. Sajikan dengan sayur bayam & nasi hangat.", "https://www.youtube.com/results?search_query=resep+ayam+goreng+kaldu+sayur+bayam"),
+            ("Jumat", "🦐 Tumis Udang Brokoli Mentega", "Bahan: 50g Udang Kupas, Brokoli, Mentega, Kecap Manis.\n\nCara Memasak:\n1. Tumis udang & brokoli dengan mentega harum.\n2. Beri sedikit kecap manis.", "https://www.youtube.com/results?search_query=resep+udang+brokoli+mentega+anak"),
+            ("Sabtu", "🍳 Telur Dadar Kelor & Nasi Warm", "Bahan: 1 Telur, Daun Kelor Cincang, Margarin.\n\nCara Memasak:\n1. Kocok 1 telur dengan daun kelor cincang halus.\n2. Dadar tipis dengan margarin dan sajikan.", "https://www.youtube.com/results?search_query=resep+telur+dadar+daun+kelor"),
+            ("Minggu", "🥞 Pancake Hati Ayam & Pisang", "Bahan: Tepung Terigu, Pisang Lumat, Telur, Bubuk Hati Ayam.\n\nCara Memasak:\n1. Campurkan terigu, pisang lumat, telur, & bubuk hati ayam.\n2. Panggang di teflon api kecil hingga keemasan.", "https://www.youtube.com/results?search_query=resep+pancake+hati+ayam+pisang")
         ]
     elif "Anak-Anak" in cat_recipe:
         recipes = [
-            ("Senin", "🍱 Bento Nasi Kuning Ayam Popcorn", "Bahan: Nasi Kuning, Dada Ayam Tepung, Telur Rebus, Wortel.\n\nTutorial:\n1. Goreng dada ayam tepung crispy.\n2. Cetak nasi kuning dan hias bersama potongan telur rebus.", "https://www.youtube.com/results?search_query=resep+bento+anak+sekolah+sehat"),
-            ("Selasa", "🍝 Spaghetti Salmon Bolognese", "Bahan: Pasta Spaghetti, Fillet Salmon Cincang, Saus Tomat Homemade.\n\nTutorial:\n1. Rebus spaghetti al dente.\n2. Tumis salmon cincang dengan saus tomat lalu siram di atas pasta.", "https://www.youtube.com/results?search_query=resep+spaghetti+salmon+anak"),
-            ("Rabu", "🍲 Sup Makaroni Daging Sapi & Buncis", "Bahan: Daging Sapi Cincang, Makaroni, Buncis, Wortel, Kaldu Sapi.\n\nTutorial:\n1. Rebus daging sapi dan makaroni hingga empuk.\n2. Masukkan sayuran buncis & wortel dalam kuah kaldu gizi.", "https://www.youtube.com/results?search_query=resep+sup+makaroni+daging+sapi"),
-            ("Kamis", "🍳 Nasi Goreng Telur Puyuh & Udang", "Bahan: Nasi Putih, 4 Telur Puyuh, Udang Kupas, Minyak Wijen.\n\nTutorial:\n1. Tumis udang kupas dan telur puyuh orak-arik.\n2. Masukkan nasi dan bumbui ringan tanpa pengawet.", "https://www.youtube.com/results?search_query=resep+nasi+goreng+sehat+anak"),
-            ("Jumat", "🍗 Chicken Teriyaki & Tumis Brokoli", "Bahan: Dada Ayam, Saus Teriyaki, Brokoli, Biji Wijen.\n\nTutorial:\n1. Tumis ayam potong dengan saus teriyaki gurih.\n2. Sajikan dengan rebusan brokoli segar & taburan biji wijen.", "https://www.youtube.com/results?search_query=resep+chicken+teriyaki+anak"),
-            ("Sabtu", "🥪 Sandwich Telur Keju & Daging Asap", "Bahan: Roti Tawar Gandum, Telur Dadar, Keju Slice, Daging Asap.\n\nTutorial:\n1. Panggang roti gandum di atas teflon.\n2. Susun telur dadar, keju, & daging asap hangat.", "https://www.youtube.com/results?search_query=resep+sandwich+sehat+anak"),
-            ("Minggu", "🍲 Soto Ayam Kuah Bening & Telur Rebus", "Bahan: Daging Ayam Suwir, Kuah Soto Bening, Telur Rebus, Tauge.\n\nTutorial:\n1. Rebus ayam kuah soto rempah alami.\n2. Sajikan suwiran ayam, tauge, & telur rebus matang.", "https://www.youtube.com/results?search_query=resep+soto+ayam+kuah+bening")
+            ("Senin", "🍱 Bento Nasi Kuning Ayam Popcorn", "Bahan: Nasi Kuning, Dada Ayam Tepung, Telur Rebus.\n\nCara Memasak:\n1. Goreng dada ayam tepung crispy.\n2. Cetak nasi kuning dan hias bersama telur rebus.", "https://www.youtube.com/results?search_query=resep+bento+anak+sekolah+sehat"),
+            ("Selasa", "🍝 Spaghetti Salmon Bolognese", "Bahan: Pasta Spaghetti, Salmon Cincang, Saus Tomat.\n\nCara Memasak:\n1. Rebus spaghetti al dente.\n2. Tumis salmon cincang dengan saus tomat lalu siram di atas pasta.", "https://www.youtube.com/results?search_query=resep+spaghetti+salmon+anak"),
+            ("Rabu", "🍲 Sup Makaroni Daging Sapi", "Bahan: Daging Cincang, Makaroni, Buncis, Wortel, Kaldu Sapi.\n\nCara Memasak:\n1. Rebus daging dan makaroni hingga empuk.\n2. Masukkan sayuran buncis & wortel dalam kuah kaldu.", "https://www.youtube.com/results?search_query=resep+sup+makaroni+daging+sapi"),
+            ("Kamis", "🍳 Nasi Goreng Telur Puyuh & Udang", "Bahan: Nasi Putih, 4 Telur Puyuh, Udang Kupas, Minyak Wijen.\n\nCara Memasak:\n1. Tumis udang dan telur puyuh orak-arik.\n2. Masukkan nasi dan bumbui ringan.", "https://www.youtube.com/results?search_query=resep+nasi+goreng+sehat+anak"),
+            ("Jumat", "🍗 Chicken Teriyaki & Brokoli", "Bahan: Dada Ayam, Saus Teriyaki, Brokoli, Wijen.\n\nCara Memasak:\n1. Tumis ayam potong saus teriyaki gurih.\n2. Sajikan dengan rebusan brokoli segar & wijen.", "https://www.youtube.com/results?search_query=resep+chicken+teriyaki+anak"),
+            ("Sabtu", "🥪 Sandwich Telur Keju Daging Asap", "Bahan: Roti Gandum, Telur Dadar, Keju Slice, Daging Asap.\n\nCara Memasak:\n1. Panggang roti gandum di atas teflon.\n2. Susun telur dadar, keju, & daging asap hangat.", "https://www.youtube.com/results?search_query=resep+sandwich+sehat+anak"),
+            ("Minggu", "🍲 Soto Ayam Kuah Bening", "Bahan: Suwir Ayam, Kuah Soto Bening, Telur Rebus, Tauge.\n\nCara Memasak:\n1. Rebus ayam kuah soto rempah alami.\n2. Sajikan suwiran ayam, tauge, & telur rebus.", "https://www.youtube.com/results?search_query=resep+soto+ayam+kuah+bening")
         ]
     elif "Remaja" in cat_recipe:
         recipes = [
-            ("Senin", "🥩 Beef Bowl Yoshinoya Style & Egg", "Bahan: Daging Sapi Slice, Bawang Bombay, Kecap Asin, 1 Telur Ceplok.\n\nTutorial:\n1. Tumis daging sapi slice bersama bawang bombay saus gurih.\n2. Tumpuk di atas nasi hangat bersama telur ceplok setengah matang.", "https://www.youtube.com/results?search_query=resep+beef+bowl+ala+yoshinoya"),
-            ("Selasa", "🥗 Salad Salmon Panggang & Avokad", "Bahan: Fillet Salmon, Alpukat Slice, Sayur Selada, Olive Oil.\n\nTutorial:\n1. Panggang salmon dengan garam & lada hitam.\n2. Campur selada segar, potongan alpukat, & dressing olive oil.", "https://www.youtube.com/results?search_query=resep+salad+salmon+alpukat"),
-            ("Rabu", "🍗 Ayam Bakar Madu & Tumis Kangkung", "Bahan: Paha Ayam, Bumbu Madu, Kangkung, Bawang Merah Putih.\n\nTutorial:\n1. Ungkep ayam bumbu madu lalu bakar keemasan.\n2. Tumis kangkung segar dengan sedikit minyak.", "https://www.youtube.com/results?search_query=resep+ayam+bakar+madu+teflon"),
-            ("Kamis", "🍲 Sup Ikan Batang Asam Pedas", "Bahan: Fillet Kakap/Tenggiri, Tomat Hijau, Belimbing Wulung.\n\nTutorial:\n1. Rebus kuah rempah bening asam segar.\n2. Masukkan fillet ikan & potongan tomat hingga matang.", "https://www.youtube.com/results?search_query=resep+sup+ikan+asam+pedas"),
-            ("Jumat", "🍝 Fusilli Tuna Spicy Olive Oil", "Bahan: Pasta Fusilli, Tuna Cincang, Cabai Rawit, Minyak Zaitun.\n\nTutorial:\n1. Tumis tuna cincang & irisan cabai dengan olive oil.\n2. Campurkan pasta fusilli rebus.", "https://www.youtube.com/results?search_query=resep+pasta+tuna+aglio+olio"),
-            ("Sabtu", "🍳 Omelet Daging Cincang & Bayam Keju", "Bahan: 2 Telur Ayam, Daging Sapi Cincang, Bayam, Keju Mozzarella.\n\nTutorial:\n1. Kocok telur dengan isi daging cincang & bayam.\n2. Lipat omelet dan beri lelehan keju mozzarella di atasnya.", "https://www.youtube.com/results?search_query=resep+omelet+keju+daging+cincang"),
-            ("Minggu", "🥣 Smoothies Bowl Buah Naga & Chia", "Bahan: Buah Naga Blend, Pisang, Chia Seeds, Kacang Almond.\n\nTutorial:\n1. Blender halus buah naga & pisang dingin.\n2. Tuang ke mangkok dan beri topping chia seeds & almond renyah.", "https://www.youtube.com/results?search_query=resep+smoothie+bowl+buah+naga")
+            ("Senin", "🥩 Beef Bowl Yoshinoya & Egg", "Bahan: Daging Sapi Slice, Bawang Bombay, Kecap Asin, Telur.\n\nCara Memasak:\n1. Tumis daging sapi slice bersama bawang bombay saus gurih.\n2. Tumpuk di atas nasi hangat & telur ceplok.", "https://www.youtube.com/results?search_query=resep+beef+bowl+ala+yoshinoya"),
+            ("Selasa", "🥗 Salad Salmon Panggang Alpukat", "Bahan: Fillet Salmon, Alpukat, Selada, Olive Oil.\n\nCara Memasak:\n1. Panggang salmon dengan garam & lada hitam.\n2. Campur selada segar, alpukat, & dressing olive oil.", "https://www.youtube.com/results?search_query=resep+salad+salmon+alpukat"),
+            ("Rabu", "🍗 Ayam Bakar Madu Kangkung", "Bahan: Paha Ayam, Bumbu Madu, Kangkung, Bawang.\n\nCara Memasak:\n1. Ungkep ayam bumbu madu lalu bakar keemasan.\n2. Tumis kangkung segar dengan sedikit minyak.", "https://www.youtube.com/results?search_query=resep+ayam+bakar+madu+teflon"),
+            ("Kamis", "🍲 Sup Ikan Asam Pedas", "Bahan: Fillet Kakap, Tomat Hijau, Belimbing Wulung.\n\nCara Memasak:\n1. Rebus kuah rempah bening asam segar.\n2. Masukkan fillet ikan & potongan tomat.", "https://www.youtube.com/results?search_query=resep+sup+ikan+asam+pedas"),
+            ("Jumat", "🍝 Fusilli Tuna Spicy Olive Oil", "Bahan: Pasta Fusilli, Tuna, Cabai Rawit, Minyak Zaitun.\n\nCara Memasak:\n1. Tumis tuna & cabai dengan olive oil.\n2. Campurkan pasta fusilli rebus.", "https://www.youtube.com/results?search_query=resep+pasta+tuna+aglio+olio"),
+            ("Sabtu", "🍳 Omelet Daging Bayam Keju", "Bahan: 2 Telur, Daging Cincang, Bayam, Mozzarella.\n\nCara Memasak:\n1. Kocok telur dengan isi daging & bayam.\n2. Lipat omelet dan beri lelehan keju mozzarella.", "https://www.youtube.com/results?search_query=resep+omelet+keju+daging+cincang"),
+            ("Minggu", "🥣 Smoothies Buah Naga & Chia", "Bahan: Buah Naga, Pisang, Chia Seeds, Almond.\n\nCara Memasak:\n1. Blender halus buah naga & pisang dingin.\n2. Tuang ke mangkok & beri topping chia seeds & almond.", "https://www.youtube.com/results?search_query=resep+smoothie+bowl+buah+naga")
         ]
     elif "Dewasa" in cat_recipe:
         recipes = [
-            ("Senin", "🐟 Salmon Panggang Lemon & Kentang", "Bahan: Fillet Salmon, Perasan Lemon, Kentang, Rosemary.\n\nTutorial:\n1. Marinasi salmon dengan perasan lemon & lada.\n2. Panggang teflon 8 menit & sajikan dengan kentang rebus.", "https://www.youtube.com/results?search_query=resep+salmon+panggang+lemon"),
-            ("Selasa", "🥗 Pokebowl Tuna Segar & Edamame", "Bahan: Fillet Tuna, Kacang Edamame, Nasi Merah, Wijen.\n\nTutorial:\n1. Tumis tuna sebentar dengan minyak wijen.\n2. Susun di atas nasi merah bersama edamame rebus.", "https://www.youtube.com/results?search_query=resep+tuna+poke+bowl"),
-            ("Rabu", "🥩 Tumis Daging Sapi Lada Hitam", "Bahan: Daging Sapi Lean Slice, Paprika Merah Hijau, Lada Hitam.\n\nTutorial:\n1. Tumis daging sapi tanpa lemak bersama saus lada hitam.\n2. Masukkan potongan paprika kaya vitamin C.", "https://www.youtube.com/results?search_query=resep+daging+sapi+lada+hitam"),
-            ("Kamis", "🍗 Dada Ayam Panggang Herb", "Bahan: Dada Ayam Tanpa Kulit, Oregano, Buncis, Minyak Zaitun.\n\nTutorial:\n1. Panggang dada ayam bumbu herb rendah garam.\n2. Tumis buncis dengan minyak zaitun ringan.", "https://www.youtube.com/results?search_query=resep+dada+ayam+panggang+diet"),
-            ("Jumat", "🍲 Sup Ikan Gurame Bening Kemangi", "Bahan: Fillet Gurame, Daun Kemangi, Jahe, Serai, Kuah Bening.\n\nTutorial:\n1. Rebus kuah jahe serai wangi tanpa santan.\n2. Masukkan fillet gurame & daun kemangi hingga segar.", "https://www.youtube.com/results?search_query=resep+sup+ikan+gurame+kemangi"),
-            ("Sabtu", "🍳 Tofu Stir Fry Shimeji & Telur", "Bahan: Tofu Jepang, Jamur Shimeji, 1 Telur, Saus Tiram.\n\nTutorial:\n1. Tumis tofu & jamur shimeji saus tiram rendah natrium.\n2. Orak-arik telur sebagai peningkat protein.", "https://www.youtube.com/results?search_query=resep+tumis+tofu+jamur+shimeji"),
-            ("Minggu", "🥣 Oatmeal Kayu Manis & Telur Rebus", "Bahan: Rolled Oats, Bubuk Kayu Manis, Buah Apel, 2 Telur Rebus.\n\nTutorial:\n1. Seduh rolled oats hangat dan beri parutan apel & kayu manis.\n2. Sajikan dengan 2 butir telur rebus matang.", "https://www.youtube.com/results?search_query=resep+oatmeal+sehat+pagi+hari")
+            ("Senin", "🐟 Salmon Lemon Kentang", "Bahan: Fillet Salmon, Lemon, Kentang, Rosemary.\n\nCara Memasak:\n1. Marinasi salmon dengan lemon & lada.\n2. Panggang teflon 8 menit & sajikan dengan kentang rebus.", "https://www.youtube.com/results?search_query=resep+salmon+panggang+lemon"),
+            ("Selasa", "🥗 Pokebowl Tuna Edamame", "Bahan: Tuna, Edamame, Nasi Merah, Wijen.\n\nCara Memasak:\n1. Tumis tuna sebentar dengan minyak wijen.\n2. Susun di atas nasi merah bersama edamame rebus.", "https://www.youtube.com/results?search_query=resep+tuna+poke+bowl"),
+            ("Rabu", "🥩 Sapi Lada Hitam Paprika", "Bahan: Daging Sapi Lean, Paprika, Saus Lada Hitam.\n\nCara Memasak:\n1. Tumis daging sapi tanpa lemak & saus lada hitam.\n2. Masukkan potongan paprika kaya vitamin C.", "https://www.youtube.com/results?search_query=resep+daging+sapi+lada+hitam"),
+            ("Kamis", "🍗 Dada Ayam Panggang Herb", "Bahan: Dada Ayam, Oregano, Buncis, Olive Oil.\n\nCara Memasak:\n1. Panggang dada ayam bumbu herb rendah garam.\n2. Tumis buncis dengan minyak zaitun ringan.", "https://www.youtube.com/results?search_query=resep+dada+ayam+panggang+diet"),
+            ("Jumat", "🍲 Sup Gurame Kemangi", "Bahan: Fillet Gurame, Kemangi, Jahe, Serai.\n\nCara Memasak:\n1. Rebus kuah jahe serai wangi tanpa santan.\n2. Masukkan fillet gurame & kemangi hingga segar.", "https://www.youtube.com/results?search_query=resep+sup+ikan+gurame+kemangi"),
+            ("Sabtu", "🍳 Tofu Shimeji Stir Fry", "Bahan: Tofu, Jamur Shimeji, Telur, Saus Tiram.\n\nCara Memasak:\n1. Tumis tofu & jamur shimeji saus tiram rendah natrium.\n2. Orak-arik telur sebagai tambahan protein.", "https://www.youtube.com/results?search_query=resep+tumis+tofu+jamur+shimeji"),
+            ("Minggu", "🥣 Oatmeal Apel Kayu Manis", "Bahan: Rolled Oats, Kayu Manis, Apel, Telur Rebus.\n\nCara Memasak:\n1. Seduh rolled oats hangat & beri parutan apel.\n2. Sajikan dengan 2 butir telur rebus.", "https://www.youtube.com/results?search_query=resep+oatmeal+sehat+pagi+hari")
         ]
     else: # Lansia
         recipes = [
-            ("Senin", "🐟 Tim Fillet Kakap Jahe Lengkuas", "Bahan: Fillet Kakap, Irisan Jahe, Daun Bawang, Minyak Wijen.\n\nTutorial:\n1. Kukus fillet kakap dengan irisan jahe & serai hingga lembut.\n2. Beri beberapa tetes minyak wijen wangi tanpa garam berlebih.", "https://www.youtube.com/results?search_query=resep+tim+ikan+kakap+jahe+lansia"),
-            ("Selasa", "🍲 Sup Tahu Sutra & Ayam Cincang", "Bahan: Tahu Sutra, Dada Ayam Cincang, Labu Siam, Kuah Bening.\n\nTutorial:\n1. Rebus kuah kaldu bening rendah garam.\n2. Masukkan tahu sutra lembut & ayam cincang empuk mudah dikunyah.", "https://www.youtube.com/results?search_query=resep+sup+tahu+sutra+ayam"),
-            ("Rabu", "🥚 Pepes Telur Tahu & Kemangi", "Bahan: 2 Telur Kocok, Tahu Lumat, Daun Kemangi, Bungkus Pisang.\n\nTutorial:\n1. Campur lumat tahu dan telur dengan kemangi harum.\n2. Kukus dalam daun pisang hingga matang empuk.", "https://www.youtube.com/results?search_query=resep+pepes+tahu+telur+lembut"),
-            ("Kamis", "🥩 Semur Daging Giling Empuk & Wortel", "Bahan: Daging Sapi Giling Halus, Wortel Rebus Empuk, Kecap.\n\nTutorial:\n1. Masak daging sapi giling lembut dengan bumbu semur ringan.\n2. Masukkan wortel rebus hingga tekstur sangat lembut.", "https://www.youtube.com/results?search_query=resep+semur+daging+giling+lansia"),
-            ("Jumat", "🥣 Bubur Manado Tinutuan Komplit", "Bahan: Beras, Labu Kuning Lumat, Bayam, Jagung Manis Pipil.\n\nTutorial:\n1. Masak bubur beras bersama labu kuning lumat kaya karotenoid.\n2. Masukkan sayuran lembut untuk kemudahan cerna lansia.", "https://www.youtube.com/results?search_query=resep+bubur+manado+sehat"),
-            ("Sabtu", "🍲 Sup Ayam Ceker & Sayuran Bening", "Bahan: Ceker Ayam Kaldu, Wortel, Kentang, Brokoli Rebus.\n\nTutorial:\n1. Rebus ceker ayam lama hingga keluar kolagen kaldu alami.\n2. Masukkan sayuran dipotong kecil empuk.", "https://www.youtube.com/results?search_query=resep+sup+ceker+ayam+kolagen"),
-            ("Minggu", "🍳 Scrambled Egg Tahu & Puree Labu", "Bahan: 2 Telur Bebek/Ayam, Tahu Sutra, Puree Labu Kuning.\n\nTutorial:\n1. Orak-arik lembut telur dan tahu sutra dengan butter.\n2. Sajikan bersama puree labu kuning hangat yang lezat.", "https://www.youtube.com/results?search_query=resep+telur+orak+arik+tahu+lembut")
+            ("Senin", "🐟 Tim Kakap Jahe", "Bahan: Fillet Kakap, Jahe, Daun Bawang, Minyak Wijen.\n\nCara Memasak:\n1. Kukus fillet kakap dengan jahe hingga sangat lembut.\n2. Beri beberapa tetes minyak wijen wangi.", "https://www.youtube.com/results?search_query=resep+tim+ikan+kakap+jahe+lansia"),
+            ("Selasa", "🍲 Sup Tahu Sutra Ayam", "Bahan: Tahu Sutra, Ayam Cincang, Labu Siam, Kuah Kaldu.\n\nCara Memasak:\n1. Rebus kuah kaldu bening rendah garam.\n2. Masukkan tahu sutra & ayam cincang empuk.", "https://www.youtube.com/results?search_query=resep+sup+tahu+sutra+ayam"),
+            ("Rabu", "🥚 Pepes Telur Tahu Kemangi", "Bahan: 2 Telur, Tahu Lumat, Kemangi, Daun Pisang.\n\nCara Memasak:\n1. Campur tahu dan telur dengan kemangi harum.\n2. Kukus dalam daun pisang hingga matang empuk.", "https://www.youtube.com/results?search_query=resep+pepes+tahu+telur+lembut"),
+            ("Kamis", "🥩 Semur Daging Giling Wortel", "Bahan: Daging Sapi Giling, Wortel Rebus, Kecap.\n\nCara Memasak:\n1. Masak daging sapi giling lembut bumbu semur.\n2. Masukkan wortel hingga tekstur sangat empuk.", "https://www.youtube.com/results?search_query=resep+semur+daging+giling+lansia"),
+            ("Jumat", "🥣 Bubur Manado Tinutuan", "Bahan: Beras, Labu Kuning, Bayam, Jagung.\n\nCara Memasak:\n1. Masak bubur beras bersama labu kuning lumat.\n2. Masukkan sayuran lembut untuk kemudahan cerna.", "https://www.youtube.com/results?search_query=resep+bubur+manado+sehat"),
+            ("Sabtu", "🍲 Sup Ceker Kolagen", "Bahan: Ceker Ayam, Wortel, Kentang, Brokoli.\n\nCara Memasak:\n1. Rebus ceker ayam lama hingga keluar kolagen.\n2. Masukkan sayuran potong kecil empuk.", "https://www.youtube.com/results?search_query=resep+sup+ceker+ayam+kolagen"),
+            ("Minggu", "🍳 Scrambled Tahu Puree Labu", "Bahan: Telur, Tahu Sutra, Puree Labu Kuning, Butter.\n\nCara Memasak:\n1. Orak-arik lembut telur dan tahu sutra dengan butter.\n2. Sajikan bersama puree labu kuning hangat.", "https://www.youtube.com/results?search_query=resep+telur+orak+arik+tahu+lembut")
         ]
 
-    for day_name, title, tut, yt_link in recipes:
-        with st.expander(f"🍽️ {day_name}: {title}"):
-            st.markdown(f"**Bahan & Cara Memasak:**\n\n{tut}")
-            st.markdown(f'<a href="{yt_link}" target="_blank" class="ref-btn">▶️ Tonton Video Tutorial YouTube</a>', unsafe_allow_html=True)
+    # Render Resep dalam Format Card Grid Animatif (3 Kolom)
+    col_r1, col_r2, col_r3 = st.columns(3)
+    cols = [col_r1, col_r2, col_r3]
 
-# ================= TAB 4: EDUKASI & BERITA VIDEO (LENGKAP DEFINISI, BAHAYA & LINK) =================
+    for idx, (day_name, title, tut, yt_link) in enumerate(recipes):
+        current_col = cols[idx % 3]
+        with current_col:
+            st.markdown(f"""
+            <div class="recipe-card">
+                <span class="recipe-badge">{day_name}</span>
+                <h4 style="color: #38BDF8; margin-top: 5px; margin-bottom: 10px;">{title}</h4>
+                <p style="font-size: 13px; line-height: 1.5; opacity: 0.9; white-space: pre-line;">{tut}</p>
+                <a href="{yt_link}" target="_blank" class="ref-btn">▶️ Tonton Video YouTube</a>
+            </div>
+            """, unsafe_allow_html=True)
+
+# ================= TAB 4: EDUKASI & BERITA VIDEO =================
 with tab4:
     st.markdown(f"### {txt['edu_title']}")
     
